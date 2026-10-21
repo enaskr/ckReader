@@ -1,0 +1,150 @@
+'use strict';
+const $=s=>document.querySelector(s), pending=new Map();window.setAppVersion=v=>document.querySelectorAll('.appVersion').forEach(e=>e.textContent=String(v||'e-Library'));let downloadPath='Download/ebook/Yes24';window.setDownloadPath=p=>{downloadPath=String(p||downloadPath);for(const id of ['downloadStatus','libDownloadStatus','purchaseDownloadStatus']){const e=$('#'+id);if(e&&!downloadBusy)e.textContent='저장 위치 · '+downloadPath;}const a=$('#downloadSettingsPath');if(a)a.textContent='저장 위치 · '+downloadPath;const b=$('#electronicSettingsPath');if(b)b.textContent='도서관별 주소·아이디·MAC을 저장합니다. 저장 위치 · '+downloadPath;};let seq=0, session={loggedIn:false}, currentTab='home', currentShelfTab='purchases', mainDoc, searchPage=1, libraryPage=1, searchTerm='', detailSerial=0, shelfIds=new Set();
+function rpc(action,args={}){if(['fetch','add','remove','download','devices','logout','downloadOptions'].includes(action))args={...args,cremaAccountId:session.userId||''};return new Promise((resolve,reject)=>{const id=String(++seq);pending.set(id,{resolve,reject});Crema.call(JSON.stringify({id,action,args}));});}
+window.nativeResult=r=>{const p=pending.get(r.id);if(!p)return;pending.delete(r.id);r.error?p.reject(new Error(r.error)):p.resolve(r.result);};
+const escapeHTML=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const doc=s=>new DOMParser().parseFromString(s,'text/html');
+function text(el,selector){return (el?.querySelector(selector)?.textContent||'').trim().replace(/\s+/g,' ');}
+function parseBooks(root){if(!root)return[];const seen=new Set();return [...root.querySelectorAll('.itemUnit')].flatMap(e=>{const link=e.querySelector('a.gd_name[href*="/Detail/"]')||e.querySelector('a[href*="/Detail/"]');const id=link?.getAttribute('href').match(/\/Detail\/(\d+)/i)?.[1];if(!id||seen.has(id))return[];seen.add(id);const img=e.querySelector('.img_grp img')||e.querySelector('img');return[{id,title:text(e,'.gd_name')||img?.alt||'제목 없음',author:text(e,'.info_auth'),publisher:text(e,'.info_pub'),image:'https://image.yes24.com/goods/'+id+'/L'}];});}
+function toast(s){$('#toast').textContent=s;$('#toast').hidden=false;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('#toast').hidden=true,4200);}
+function loading(el){el.innerHTML='<div class="loading">책을 불러오는 중…</div>';}
+function fail(el,error,retry){el.replaceChildren();const d=document.createElement('div');d.className='empty';d.textContent=error.message||error;if(retry){d.append(document.createElement('br'));const b=document.createElement('button');b.textContent='다시 시도';b.onclick=retry;d.append(b);}el.append(d);}
+function renderBooks(el,books,rank=false,append=false){if(!append)el.replaceChildren();if(!books.length&&!append){fail(el,'표시할 도서가 없습니다.');return;}for(const [i,b]of books.entries()){const button=document.createElement('button');button.className='book';button.setAttribute('aria-label',b.title+' 상세 보기');button.innerHTML='<span class="cover"><img loading="lazy" src="'+b.image+'" alt="'+escapeHTML(b.title)+' 표지"></span>'+(rank?'<span class="rank">'+(i+1)+'</span>':'')+'<span class="name">'+escapeHTML(b.title)+'</span><span class="author">'+escapeHTML(b.author)+'</span>';button.onclick=()=>openDetail({...b,fromLibrary:el.id==='libraryBooks'});button.querySelector('img').onerror=e=>{e.target.style.opacity='.2';};el.append(button);}}
+const definitions=[['best','베스트셀러'],['choice','눈에 띄는 책'],['new','새로 들어왔어요'],['live','지금 많이 보고 있어요'],['pick1','크클 PICK 경제경영/자기계발'],['pick2','크클 PICK 인문/철학/심리'],['pick3','크클 PICK 사회/과학/예술'],['pick4','크클 PICK 실용/IT']];
+function setupSections(){for(const[id,title]of definitions){const s=document.createElement('section');s.className='shelf';s.id=id;s.innerHTML='<div class="sectionhead"><h2>'+title+'</h2><small>CREMA CLUB</small></div>'+(id==='best'?'<div class="chips"><button data-order="Day">일별</button><button data-order="Week" class="selected">주별</button><button data-order="Month">월별</button></div>':'')+(id==='live'?'<div class="filters"><select id="age" aria-label="연령"><option value="99">연령 전체</option><option value="10">10대</option><option value="20">20대</option><option value="30">30대</option><option value="40">40대</option><option value="50">50대 이상</option></select><select id="sex" aria-label="성별"><option value="A">성별 전체</option><option value="M">남성</option><option value="F">여성</option></select></div>':'')+'<div class="books"><div class="loading">책을 불러오는 중…</div></div>';$('#sections').append(s);}$('#best .chips').onclick=e=>{const b=e.target.closest('[data-order]');if(!b)return;$('#best .selected')?.classList.remove('selected');b.classList.add('selected');loadBest(b.dataset.order);};$('#age').onchange=loadLive;$('#sex').onchange=loadLive;}
+let bestSerial=0,liveSerial=0;
+async function loadBest(order='Week'){const version=++bestSerial,el=$('#best .books');loading(el);try{const books=parseBooks(doc(await rpc('fetch',{path:'/BookClub/GetPopularEbookList?pageSize=18&order='+order})));if(version===bestSerial)renderBooks(el,books,true);}catch(e){if(version===bestSerial)fail(el,e,()=>loadBest(order));}}
+async function loadLive(){const version=++liveSerial,el=$('#live .books');loading(el);try{const books=parseBooks(doc(await rpc('fetch',{path:'/BookClub/LiveTrendBooks?age='+$('#age').value+'&sex='+$('#sex').value})));if(version===liveSerial)renderBooks(el,books,true);}catch(e){if(version===liveSerial)fail(el,e,loadLive);}}
+async function loadMain(){try{mainDoc=doc(await rpc('fetch',{path:'/BookClub/Main'}));renderBooks($('#choice .books'),parseBooks(mainDoc.querySelector('.bCSecBChoice')));renderBooks($('#new .books'),parseBooks(mainDoc.querySelector('.bCSecNew')));for(const [id,title]of definitions.slice(4)){const h=[...mainDoc.querySelectorAll('.tit_txt')].find(x=>x.textContent.replace(/\s+/g,'').includes(title.replace(/\s+/g,'')));renderBooks($('#'+id+' .books'),parseBooks(h?.closest('.bCSec')));}}catch(e){for(const[id]of definitions.filter(x=>!['best','live'].includes(x[0])))fail($('#'+id+' .books'),e,loadMain);}}
+function tab(name){currentTab=name;for(const id of ['home','library','settings','results','electronicBrowse','yes24Ebook'])$('#'+id).hidden=id!==name;document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.tab===name||(name==='results'&&b.dataset.tab==='home')));window.scrollTo(0,0);if(name==='library')shelfTab('purchases');if(name==='settings')refreshStatus();if(name==='yes24Ebook'&&window.yes24Tab)window.yes24Tab();$('#search').hidden=!['home','results'].includes(name);if(window.electronicTab)window.electronicTab(name);}
+function shelfTab(name){currentShelfTab=name;const map={crema:'cremaShelf',electronic:'electronicShelf',purchases:'purchaseShelf',saved:'savedFilesPanel',queue:'downloadQueuePanel'};for(const id of ['cremaShelf','electronicShelf','purchaseShelf','savedFilesPanel','downloadQueuePanel'])$('#'+id).hidden=id!==map[name];document.querySelectorAll('[data-shelf-tab]').forEach(b=>{const active=b.dataset.shelfTab===name;b.classList.toggle('selected',active);b.setAttribute('aria-selected',String(active));});window.scrollTo(0,0);if(name==='crema')loadLibrary();if(name==='electronic'&&window.electronicShelfSelected)window.electronicShelfSelected();if(name==='purchases')loadPurchases();if(name==='saved')window.renderDownloadCenter?.('saved');if(name==='queue')window.renderDownloadCenter?.('queue');}
+async function refreshStatus(){try{session=await rpc('status');renderStatus();}catch(e){toast(e.message);}}
+function renderStatus(){renderCremaAccounts();renderYes24Accounts();if(!addingCremaAccount)$('#userId').value=session.userId||$('#userId').value;$('#account').textContent=session.loggedIn?session.userId+' · 사용자 번호 '+session.userNo:'';$('#loginForm').hidden=!!session.loggedIn&&!addingCremaAccount;$('#cancelCremaLogin').hidden=!addingCremaAccount;const y=session.yes24||{};if(!addingYes24Account)$('#yes24UserId').value=y.userId||$('#yes24UserId').value;$('#yes24LoginForm').hidden=!!y.loggedIn&&!addingYes24Account;$('#cancelYes24Login').hidden=!addingYes24Account;$('#yes24Logout').hidden=!y.loggedIn;$('#filenamePattern').value=session.filenamePattern||DEFAULT_FILENAME_PATTERN;$('#logout').hidden=!session.loggedIn;$('#deleteAfterDownload').checked=!!session.deleteAfterDownload;$('#devices').replaceChildren();if(!session.loggedIn){$('#devices').textContent='로그인 후 확인할 수 있습니다.';return;}for(const[dIndex,d]of(session.devices||[]).entries()){const el=document.createElement('div');el.className='device';el.innerHTML=escapeHTML(d.deviceName)+' · '+escapeHTML(d.deviceType)+(dIndex===0?'<span class="tag">사용 중</span>':'')+'<small>'+escapeHTML(d.deviceId)+'</small>';$('#devices').append(el);}}
+let searchSerial=0,cremaShelfSerial=0;
+async function search(more=false){const term=$('#query').value.trim();if(!term){toast('검색어를 입력해주세요.');return;}if(!more){searchTerm=term;searchPage=1;tab('results');loading($('#searchBooks'));}const version=++searchSerial;$('#moreSearch').disabled=true;try{const raw=await rpc('fetch',{path:'/BookClub/Search?query='+encodeURIComponent(searchTerm)+'&page='+searchPage});const books=parseBooks(doc(raw));if(version!==searchSerial)return;renderBooks($('#searchBooks'),books,false,more);$('#searchInfo').textContent='“'+searchTerm+'” 검색 결과 · '+searchPage+'페이지';$('#moreSearch').hidden=books.length<24;}catch(e){if(!more)fail($('#searchBooks'),e,()=>search());else{searchPage--;toast(e.message);}}finally{$('#moreSearch').disabled=false;}}
+async function loadLibrary(more=false){const requestSerial=++cremaShelfSerial;if(!session.loggedIn){fail($('#libraryBooks'),'설정에서 로그인하면 크레마클럽 내서재를 확인할 수 있습니다.');$('#moreLibrary').hidden=true;return;}if(!more){libraryPage=1;shelfIds=new Set();loading($('#libraryBooks'));}$('#sync').disabled=true;$('#moreLibrary').disabled=true;try{const raw=await rpc('fetch',{path:'/BookClub/MyBookclubGoodsList?order=01&dispNo=&keyword=&pageNo='+libraryPage});if(requestSerial!==cremaShelfSerial)return;const books=parseBooks(doc(raw));books.forEach(b=>shelfIds.add(b.id));renderBooks($('#libraryBooks'),books,false,more);const total=Number(raw.match(/iTotCnt\s*=\s*parseInt\("(\d+)"\)/)?.[1]||books.length);$('#syncInfo').textContent='전체 '+total+'권 · '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'})+' 동기화';$('#moreLibrary').hidden=libraryPage*24>=total;}catch(e){if(requestSerial!==cremaShelfSerial)return;if(!more)fail($('#libraryBooks'),e,()=>loadLibrary());else{libraryPage--;toast(e.message);}$('#syncInfo').textContent='동기화 실패 · 다시 시도해주세요.';}finally{$('#sync').disabled=false;$('#moreLibrary').disabled=false;}}
+const adding=new Set();
+async function addBook(b){if(adding.has(b.id))return;if(!session.loggedIn){toast('설정에서 로그인한 뒤 다시 열면 내서재에 추가됩니다.');return;}adding.add(b.id);try{await rpc('add',{id:b.id});shelfIds.add(b.id);toast('“'+b.title+'” 내서재에 담았습니다.');}catch(e){toast(e.message);}finally{adding.delete(b.id);}}
+let downloadBusy=false, jobRevision=null;
+const downloading=new Set(), removing=new Set();
+window.downloadState=state=>{
+ if($('#libDownloadStatus'))$('#libDownloadStatus').textContent=state.status||('저장 위치 · '+downloadPath);const wasBusy=downloadBusy;downloadBusy=!!state.busy;
+ $('#downloadStatus').textContent=state.status||('저장 위치 · '+downloadPath);if($('#detailDownloadStatus'))$('#detailDownloadStatus').textContent=$('#downloadStatus').textContent;
+ if(jobRevision!==null&&jobRevision!==state.revision){
+  toast(state.status);if(currentTab==='library'){if(currentShelfTab==='crema')loadLibrary();if(currentShelfTab==='purchases')loadPurchases();}
+ }
+ jobRevision=state.revision;
+ if(wasBusy&&!downloadBusy)downloading.clear();
+ if($('#downloadNow'))$('#downloadNow').disabled=downloadBusy;
+};
+async function downloadBook(b){
+ if(downloadBusy||downloading.size){toast('진행 중인 다운로드가 끝난 뒤 다시 시도해주세요.');return;}
+ downloading.add(b.id);
+ try{const result=await rpc('download',{id:b.id});if(result.started){downloadBusy=true;toast('“'+b.title+'” 다운로드를 시작합니다.');}else toast('파일 권한을 허용하면 다운로드를 시작합니다.');}
+ catch(e){toast(e.message);}finally{downloading.delete(b.id);}
+}
+async function removeBook(b){
+ if(removing.has(b.id))return;
+ removing.add(b.id);
+ try{await rpc('remove',{id:b.id});shelfIds.delete(b.id);toast('“'+b.title+'” 내서재에서 삭제했습니다.');await loadLibrary();}
+ catch(e){toast(e.message);}finally{removing.delete(b.id);}
+}
+function detailAction(action,b){$('#detail').close();detailSerial++;return action(b);}
+async function openDetail(b,retry=false){if(cremaAccountChanging){toast('계정 전환 중입니다.');return;}const serial=++detailSerial;const library=!!b.fromLibrary;loading($('#detailBody'));if(!$('#detail').open)$('#detail').showModal();
+ try{const raw=await rpc('fetch',{path:'/BookClub/Detail/'+b.id});if(serial!==detailSerial)return;const d=doc(raw);const title=text(d,'#goodsNm')||b.title,author=text(d,'.gd_auth'),publisher=text(d,'.gd_pub'),date=text(d,'.gd_date');const info={};d.querySelectorAll('.gd_infoTb').forEach(e=>info[text(e,'dt')]=text(e,'dd'));
+ $('#detailBody').innerHTML='<div class="detailhero"><img src="'+b.image+'" alt="'+escapeHTML(title)+' 표지"><div><span class="eyebrow">CREMA CLUB</span><h2>'+escapeHTML(title)+'</h2><p>'+escapeHTML(author)+'</p><div class="detailactions">'+(library?'<button id="removeNow" class="danger">내서재에서 삭제</button><button id="downloadNow" class="primary">다운로드</button>':'<button id="addNow" class="primary">내서재에 담기</button>')+'</div>'+(library?'<p id="detailDownloadStatus" role="status"></p>':'')+'</div></div><dl class="metadata">'+[['저자',author],['출판사',publisher],['출판일',date],['분야',info['분야']],['파일정보',info['파일정보']]].map(([k,v])=>'<dt>'+k+'</dt><dd>'+escapeHTML(v||'제공되지 않은 정보')+'</dd>').join('')+'</dl><div class="detailtabs"><button id="introTab" class="selected">책소개</button><button id="reviewTab">출판사 리뷰</button></div><div id="bookProse" class="prose"></div><p class="version">YES24 크레마클럽 도서정보</p>';
+ const intro=prose(d.querySelector('#infoset_introduce')),review=prose(d.querySelector('#infoset_pubReivew'));$('#bookProse').textContent=intro;$('#introTab').onclick=()=>{ $('#bookProse').textContent=intro;$('#introTab').classList.add('selected');$('#reviewTab').classList.remove('selected');};$('#reviewTab').onclick=()=>{$('#bookProse').textContent=review;$('#reviewTab').classList.add('selected');$('#introTab').classList.remove('selected');};if(library){if($('#detailDownloadStatus'))$('#detailDownloadStatus').textContent=$('#downloadStatus').textContent;$('#removeNow').onclick=()=>detailAction(removeBook,b);$('#downloadNow').disabled=downloadBusy;$('#downloadNow').onclick=()=>detailAction(downloadBook,b);}else $('#addNow').onclick=()=>detailAction(addBook,b);
+ }catch(e){if(serial===detailSerial)fail($('#detailBody'),e,()=>loadDetailRetry(b));}}
+function loadDetailRetry(b){openDetail(b,true);}
+function prose(el){if(!el)return'등록된 내용이 없습니다.';let e=el.cloneNode(true);if(/<\/?(?:b|br|p|div|span|strong|em)(?:\s[^>]*|\s*\/?)>/i.test(e.textContent))e=doc(e.textContent).body;e.querySelectorAll('script,style,.btn_halfMore,.tm_infoSet,.source-attribution').forEach(n=>n.remove());e.querySelectorAll('br').forEach(n=>n.replaceWith('\n'));e.querySelectorAll('p,div').forEach(n=>n.append('\n'));return e.textContent.trim().replace(/\n[ \t]*\n[ \t]*\n/g,'\n\n')||'등록된 내용이 없습니다.';}
+$('#closeDetail').onclick=()=>{$('#detail').close();detailSerial++;};$('#detail').addEventListener('click',e=>{if(e.target===$('#detail')){$('#detail').close();detailSerial++;}});$('#detail').addEventListener('cancel',()=>detailSerial++);
+window.handleBack=()=>{if($('#settingsTransferProgress')?.open)return true;if($('#detail').open){$('#detail').close();detailSerial++;return true;}if(currentTab!=='home'){tab('home');return true;}return false;};
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>tab(b.dataset.tab));document.querySelector('.brand')?.addEventListener('click',()=>tab('yes24Ebook'));document.querySelectorAll('[data-shelf-tab]').forEach(b=>b.onclick=()=>shelfTab(b.dataset.shelfTab));$('#search').onsubmit=e=>{e.preventDefault();search();};$('#clearSearch').onclick=()=>tab('home');$('#moreSearch').onclick=()=>{searchPage++;search(true);};$('#moreLibrary').onclick=()=>{libraryPage++;loadLibrary(true);};$('#sync').onclick=()=>loadLibrary();
+$('#loginForm').onsubmit=async e=>{e.preventDefault();if(cremaAccountChanging||downloadBusy){toast('진행 중인 작업이 끝난 뒤 로그인해주세요.');return;}$('#loginButton').disabled=true;$('#loginMessage').textContent='로그인하고 기기 정보를 가져오는 중…';const password=$('#password').value;$('#password').value='';invalidateCremaView();cremaAccountChanging=true;renderCremaAccounts();try{session=await rpc('login',{userId:$('#userId').value,password});shelfIds=new Set();addingCremaAccount=false;renderStatus();$('#loginMessage').textContent='로그인 완료 · 첫 번째 등록 기기를 사용합니다.';toast('내서재 연결이 완료됐습니다.');}catch(e){$('#loginMessage').textContent=e.message;await refreshStatus();}finally{cremaAccountChanging=false;renderCremaAccounts();$('#loginButton').disabled=false;}};
+$('#showPassword').onclick=()=>{const p=$('#password');p.type=p.type==='password'?'text':'password';$('#showPassword').textContent=p.type==='password'?'보기':'숨기기';};$('#logout').onclick=()=>changeCremaAccount('logout',session.userId);$('#refreshDevices').onclick=async()=>{$('#refreshDevices').disabled=true;try{session=await rpc('devices');renderStatus();toast('기기 목록을 갱신했습니다.');}catch(e){toast(e.message);}finally{$('#refreshDevices').disabled=false;}};
+$('#deleteAfterDownload').onchange=async()=>{try{session=await rpc('downloadOptions',{deleteAfterDownload:$('#deleteAfterDownload').checked});renderStatus();}catch(e){$('#deleteAfterDownload').checked=!!session.deleteAfterDownload;toast(e.message);}};
+$('#filePermission').onclick=async()=>{try{const r=await rpc('filePermission');toast(r.granted?(downloadPath+'에 저장할 수 있습니다.'):'저장소 권한을 허용해주세요.');}catch(e){toast(e.message);}};
+const DEFAULT_FILENAME_PATTERN='{title}-{author}-{publisher}-{ebook_id}';
+let addingCremaAccount=false,cremaAccountChanging=false;
+function invalidateCremaView(){
+ cremaShelfSerial++;detailSerial++;shelfIds.clear();$('#libraryBooks').replaceChildren();$('#moreLibrary').hidden=true;
+ if($('#detail').open)$('#detail').close();
+}
+function renderCremaAccounts(){
+ const accounts=session.accounts|| (session.userId?[{userId:session.userId,loggedIn:session.loggedIn}]:[]);
+ const html=accounts.map(a=>'<option value="'+escapeHTML(a.userId)+'">'+escapeHTML(a.userId)+(a.loggedIn?'':' · 로그인 필요')+'</option>').join('');
+ for(const id of ['cremaAccountSelect','cremaShelfAccount']){const el=$('#'+id);el.innerHTML=html||'<option value="">저장된 계정 없음</option>';el.value=session.activeAccount||session.userId||'';el.disabled=cremaAccountChanging||!accounts.length;}
+ $('#removeCremaAccount').disabled=cremaAccountChanging||!accounts.length;
+ $('#addCremaAccount').disabled=cremaAccountChanging;
+}
+async function changeCremaAccount(action,userId){
+ if(cremaAccountChanging||downloadBusy||adding.size||removing.size||downloading.size){toast('진행 중인 작업이 끝난 뒤 계정을 변경해주세요.');renderCremaAccounts();return;}
+ cremaAccountChanging=true;addingCremaAccount=false;invalidateCremaView();renderCremaAccounts();
+ try{session=await rpc(action,{userId});$('#loginMessage').textContent=action==='logout'?'선택 계정에서 로그아웃했습니다.':action==='removeAccount'?'선택 계정을 삭제했습니다.':'Crema 계정을 전환했습니다.';$('#password').value='';}
+ catch(e){toast(e.message);await refreshStatus();}
+ finally{cremaAccountChanging=false;renderStatus();if(currentTab==='library')loadLibrary();}
+}
+for(const id of ['cremaAccountSelect','cremaShelfAccount'])$('#'+id).onchange=e=>changeCremaAccount('switchAccount',e.target.value);
+$('#addCremaAccount').onclick=()=>{
+ if(downloadBusy||cremaAccountChanging){toast('진행 중인 작업이 끝난 뒤 계정을 추가해주세요.');return;}
+ addingCremaAccount=true;$('#userId').value='';$('#password').value='';renderStatus();$('#userId').focus();
+};
+$('#cancelCremaLogin').onclick=()=>{addingCremaAccount=false;$('#password').value='';renderStatus();};
+$('#removeCremaAccount').onclick=()=>changeCremaAccount('removeAccount',$('#cremaAccountSelect').value);
+let addingYes24Account=false,yes24AccountChanging=false;
+function renderYes24Accounts(){
+ const y=session.yes24||{},accounts=y.accounts||(y.userId?[{userId:y.userId,loggedIn:y.loggedIn}]:[]);
+ const html=accounts.map(a=>'<option value="'+escapeHTML(a.userId)+'">'+escapeHTML(a.userId)+(a.loggedIn?'':' · 로그인 필요')+'</option>').join('');
+ for(const id of ['yes24AccountSelect','purchaseAccount']){const el=$('#'+id);el.innerHTML=html||'<option value="">저장된 YES24 계정 없음</option>';el.value=y.activeAccount||y.userId||'';el.disabled=yes24AccountChanging||!accounts.length;}
+ $('#removeYes24Account').disabled=yes24AccountChanging||!accounts.length;$('#addYes24Account').disabled=yes24AccountChanging;
+}
+async function changeYes24Account(action,userId){
+ if(yes24AccountChanging||downloadBusy){toast('진행 중인 작업이 끝난 뒤 YES24 계정을 변경해주세요.');return;}
+ yes24AccountChanging=true;addingYes24Account=false;renderYes24Accounts();
+ try{session=await rpc(action,{userId});$('#yes24LoginMessage').textContent=action==='yes24Logout'?'YES24 계정에서 로그아웃했습니다.':action==='yes24RemoveAccount'?'YES24 계정을 삭제했습니다.':'YES24 계정을 전환했습니다.';$('#yes24Password').value='';}
+ catch(e){$('#yes24LoginMessage').textContent=e.message;await refreshStatus();}
+ finally{yes24AccountChanging=false;renderStatus();if(currentShelfTab==='purchases')loadPurchases();}
+}
+$('#yes24AccountSelect').onchange=$('#purchaseAccount').onchange=e=>changeYes24Account('yes24SwitchAccount',e.target.value);
+$('#addYes24Account').onclick=()=>{addingYes24Account=true;$('#yes24UserId').value='';$('#yes24Password').value='';renderStatus();$('#yes24UserId').focus();};
+$('#cancelYes24Login').onclick=()=>{addingYes24Account=false;$('#yes24Password').value='';renderStatus();};
+$('#removeYes24Account').onclick=()=>changeYes24Account('yes24RemoveAccount',$('#yes24AccountSelect').value);
+$('#yes24Logout').onclick=()=>changeYes24Account('yes24Logout',(session.yes24||{}).userId||'');
+$('#showYes24Password').onclick=()=>{const p=$('#yes24Password');p.type=p.type==='password'?'text':'password';$('#showYes24Password').textContent=p.type==='password'?'보기':'숨기기';};
+$('#yes24LoginForm').onsubmit=async e=>{e.preventDefault();if(yes24AccountChanging||downloadBusy)return;yes24AccountChanging=true;$('#yes24LoginButton').disabled=true;$('#yes24LoginMessage').textContent='YES24 로그인 및 기기 인증 중…';const password=$('#yes24Password').value;$('#yes24Password').value='';try{session=await rpc('yes24Login',{userId:$('#yes24UserId').value,password});addingYes24Account=false;renderStatus();$('#yes24LoginMessage').textContent='YES24 로그인 완료';toast('YES24 구매내역 계정을 연결했습니다.');}catch(e){$('#yes24LoginMessage').textContent=e.message;await refreshStatus();}finally{yes24AccountChanging=false;$('#yes24LoginButton').disabled=false;renderYes24Accounts();}};
+async function saveFilenamePattern(pattern){
+ try{session=await rpc('filenamePattern',{pattern});renderStatus();$('#filenamePatternMessage').textContent='파일명 규칙을 저장했습니다. 두 서재의 다음 다운로드부터 적용됩니다.';}
+ catch(e){$('#filenamePatternMessage').textContent=e.message;}
+}
+$('#filenamePatternForm').onsubmit=e=>{e.preventDefault();saveFilenamePattern($('#filenamePattern').value);};
+$('#resetFilenamePattern').onclick=()=>saveFilenamePattern(DEFAULT_FILENAME_PATTERN);
+let purchaseSerial=0;
+async function loadPurchases(refresh=false){
+ const serial=++purchaseSerial,el=$('#purchaseBooks');
+ if(!(session.yes24||{}).loggedIn){fail(el,'앱 설정에서 YES24 계정으로 로그인하면 eBook 구매내역을 확인할 수 있습니다.');return;}
+ loading(el);$('#purchaseSync').disabled=true;
+ try{
+  const result=await rpc('purchases',{refresh});if(serial!==purchaseSerial)return;
+  const books=result.books||[];el.replaceChildren();
+  $('#purchaseInfo').textContent='전체 '+(result.total_count??books.length)+'권 · '+(refresh?'방금 새로고침':'저장된 구매내역');
+  if(!books.length){fail(el,refresh?'구매한 eBook이 없습니다.':'새로고침을 눌러 구매내역을 불러오세요.');return;}
+  for(const b of books){
+   const card=document.createElement('article');card.className='book purchaseBook';
+   const normalizeImage=u=>String(u||'').replace(/^\/\//,'https://').replace(/^http:/i,'https:');
+   const imageCandidates=[normalizeImage(b.thumbnail_url),b.product_code&&'https://image.yes24.com/goods/'+encodeURIComponent(b.product_code)+'/L',b.ebook_code&&'https://image.yes24.com/goods/'+encodeURIComponent(b.ebook_code)+'/L',b.product_code&&'https://image.yes24.com/goods/'+encodeURIComponent(b.product_code)+'/XL'].filter((v,i,a)=>v&&a.indexOf(v)===i);
+   const image=imageCandidates.shift()||'';
+   card.innerHTML='<span class="cover"><img loading="lazy" src="'+escapeHTML(image)+'" alt="'+escapeHTML(b.title)+' 표지"></span><span class="name">'+escapeHTML(b.title)+'</span><span class="author">'+escapeHTML(b.author_name||'')+'</span><button class="primary purchaseDownload">바로 다운로드</button>';
+   card.querySelector('img').onerror=e=>{const next=imageCandidates.shift();if(next)e.target.src=next;else e.target.style.opacity='.2';};
+   card.querySelector('button').onclick=()=>downloadPurchase(b,card.querySelector('button'));el.append(card);
+  }
+ }catch(e){if(serial===purchaseSerial)fail(el,e,()=>loadPurchases(true));}
+ finally{if(serial===purchaseSerial)$('#purchaseSync').disabled=false;}
+}
+async function downloadPurchase(book,button){
+ if(downloadBusy){toast('진행 중인 다운로드가 끝난 뒤 다시 시도해주세요.');return;}
+ button.disabled=true;
+ try{const result=await rpc('purchaseDownload',{id:String(book.ebook_code)});if(result.started){downloadBusy=true;toast('“'+book.title+'” 다운로드를 시작합니다.');}}
+ catch(e){toast(e.message);button.disabled=false;}
+}
+$('#purchaseSync').onclick=()=>loadPurchases(true);
+setupSections();refreshStatus();loadBest();loadMain();loadLive();

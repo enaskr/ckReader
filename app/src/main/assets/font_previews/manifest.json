@@ -1,0 +1,123 @@
+{
+  "schema": 1,
+  "source_title": "기미독립선언서 · 국가보훈부 교육자료 한글 표기",
+  "source_url": "https://edu.mpva.go.kr/file/downloadByNo.do?attFileNo=17979&attSaveName=file%2F2024%2FUQDU9fzYsD0bJY5.pdf",
+  "preview_text": "우리는 이에 우리 조선이 독립한 나라임과\n조선 사람이 자주적인 민족임을 선언한다.\n이로써 세계 만국에 알리어 인류 평등의\n큰 도의를 분명히 하는 바이며, 이로써\n자손만대에 깨우쳐 일러 민족의 독자적\n생존의 정당한 권리를 영원히 누려\n가지게 하는 바이다.",
+  "text_sha256": "40960dee9c01b66f6589e61a02218253a53754a57aece1f69e2064db5c245997",
+  "image_width": 1200,
+  "image_height": 740,
+  "families": [
+    {
+      "id": "bareun-batang",
+      "label": "바른 바탕체",
+      "source_font_sha256": "fdc87fcc91694a161bfbe8d42f1eb62773cccccd931b781289ed87f52fb8f7b2",
+      "file": "bareun-batang.webp",
+      "image_sha256": "296a009801bcf46cec854c9dc41672a3f0899d8d704cecf414d3e657edd99106",
+      "bytes": 42804
+    },
+    {
+      "id": "school-bareun",
+      "label": "학교안심 바른바탕",
+      "source_font_sha256": "ecc10464346f7a8e645e160b3d8758f1965d28c5c3fb9516c8ef0a499df8f76f",
+      "file": "school-bareun.webp",
+      "image_sha256": "e688680240c8bac74a1ae9f50416f2b51ab8d8568ab008f86958dd5b53362daf",
+      "bytes": 44644
+    },
+    {
+      "id": "gowun-dodum",
+      "label": "고운돋움",
+      "source_font_sha256": "a6e457933227483a11758fd0947bc74422a106d46f0bf057fdaa5af94a30067d",
+      "file": "gowun-dodum.webp",
+      "image_sha256": "c789db8bb1c764ab2cee13dc8bd5f9f2e42d4cae9967d96d0de007b7756682be",
+      "bytes": 35688
+    },
+    {
+      "id": "maru-buri",
+      "label": "네이버 마루부리",
+      "source_font_sha256": "2d86f0b4950955fb69f069c415d01a51bbbbcf03682d59a6adab7f5b05d16fe5",
+      "file": "maru-buri.webp",
+      "image_sha256": "42d969f70bf54b79c974e5053ffc6bf4ff82ed4acfea58834fd2d553613ed737",
+      "bytes": 41750
+    },
+    {
+      "id": "seoul-hangang",
+      "label": "서울한강체",
+      "source_font_sha256": "c33bab9596c0b60ada7ea9b3456e00e1cfd8ee63c599db2f0ef71a84ba54769b",
+      "file": "seoul-hangang.webp",
+      "image_sha256": "29696ad62cfac63ae5f451c83271d19a77418367b336151ba8db61cb8431da67",
+      "bytes": 35936
+    },
+    {
+      "id": "seoul-namsan",
+      "label": "서울남산체",
+      "source_font_sha256": "fa449948b17d6ff79bc786c9e4281baa62a54ec2ee42f6c4691917518574efe1",
+      "file": "seoul-namsan.webp",
+      "image_sha256": "5b9e90f4f2a82f03daefd51af4411686684c32eb165b075c1f4aab67405dde6a",
+      "bytes": 32990
+    },
+    {
+      "id": "gyeonggi-batang",
+      "label": "경기천년바탕",
+      "source_font_sha256": "df13902fb156d207d8b9f3e63e21099311e77cdb4de6e7868fe24ce941bbe6e3",
+      "file": "gyeonggi-batang.webp",
+      "image_sha256": "e1ae0adc67b6d200d62a1b594f916d0b2c781eae4031c4a0a43bb34f397fb59e",
+      "bytes": 41928
+    },
+    {
+      "id": "ibm-plex-sans-kr",
+      "label": "IBM Plex Sans KR",
+      "source_font_sha256": "d87730d860b553c460c3a8bb123510b4bf1aedcdc589c344f56f033f326c8f97",
+      "file": "ibm-plex-sans-kr.webp",
+      "image_sha256": "4aae2179843878492805b39d6cf36e7bf31c784da8c51fb1549470b2d238f213",
+      "bytes": 35462
+    },
+    {
+      "id": "kopub-world-batang",
+      "label": "KoPubWorld 바탕체",
+      "source_font_sha256": "72122f815cad001c97269bb99337647336b5597d2c3f749a49fb879c9e6ae9ff",
+      "file": "kopub-world-batang.webp",
+      "image_sha256": "cf02ae86316e6032eff7f9998d1373afd2ac3e22e0ae52db1d3aabf726091fb7",
+      "bytes": 46012
+    },
+    {
+      "id": "kopub-world-dotum",
+      "label": "KoPubWorld 돋움체",
+      "source_font_sha256": "896a4952ab3c28108c095c638548989a82295cf644bcced1d4c53f5616a90db6",
+      "file": "kopub-world-dotum.webp",
+      "image_sha256": "0020cef827c63c051f17b8a72e8451cfe8cd31fd10c3abcab42e09b43faaf9ef",
+      "bytes": 36186
+    },
+    {
+      "id": "nanum-gibbeum",
+      "label": "나눔손글씨 기쁨밝음",
+      "source_font_sha256": "fa9a5be9c7ec7c903e5aa757fd56b43cf7c81acbc81b2e5001bf2f1b1c5d7861",
+      "file": "nanum-gibbeum.webp",
+      "image_sha256": "9a7ee6d6384dcf26a3463f37f132c42a5d79b0a69ca6e52c0441155054431fe2",
+      "bytes": 38846
+    },
+    {
+      "id": "seoul-alrim",
+      "label": "서울알림체",
+      "source_font_sha256": "eb0420723b27ca16bf2f42d734263a97ff23353143d452c29afa2c1d5a370ce9",
+      "file": "seoul-alrim.webp",
+      "image_sha256": "c257aa5f5c2df97c4687608860174e5ce1600ce3f0d3475d7002556a18b2884e",
+      "bytes": 35502
+    },
+    {
+      "id": "sogang",
+      "label": "서강체",
+      "source_font_sha256": "ee7dcbf3ba511d88a56de03911e563728f3751539e8a35b82448165ee3dacdc7",
+      "file": "sogang.webp",
+      "image_sha256": "10c12d018c84bb5154627d2d282d8071aa8e779bc39665685bb2166cc967ab65",
+      "bytes": 37544
+    },
+    {
+      "id": "yes24",
+      "label": "예스체",
+      "source_font_sha256": "2c07cef3f5171bf938e90962ebf89e3fd786e21e8b93fb30eada51393dedfb83",
+      "file": "yes24.webp",
+      "image_sha256": "ca59afd5d2d6100a1f16f4de993136ed0d4ee153be5a6f29c404d9b21141e877",
+      "bytes": 36726
+    }
+  ]
+}

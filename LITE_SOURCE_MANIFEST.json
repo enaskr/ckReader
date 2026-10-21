@@ -1,0 +1,1863 @@
+{
+  "project": "ckReaderLite",
+  "version": "1.7.0-lite",
+  "createdUtc": "2026-10-21T06:53:26.301767+00:00",
+  "modules": [
+    "app",
+    "providers/common",
+    "providers/yes24"
+  ],
+  "containsSigningKeys": false,
+  "files": [
+    {
+      "path": "LITE_BUILD.md",
+      "bytes": 2619,
+      "sha256": "48eacd434682eb16927fc7d7e48a53f5ffb60700ca625301707dc29c7f0410d6"
+    },
+    {
+      "path": "app/build.gradle.kts",
+      "bytes": 3980,
+      "sha256": "8021d7986e7087a728ab931b77d473c554138ba367b952341646b9e1d86a14e5"
+    },
+    {
+      "path": "app/proguard-rules.pro",
+      "bytes": 2797,
+      "sha256": "787cb8fa4efe4cdeb269be70cd6cd66cb1a9df07eeaefbc15a427c46fa33a472"
+    },
+    {
+      "path": "app/src/lite/res/values/strings.xml",
+      "bytes": 70,
+      "sha256": "950e87a1958b102712730994df65911bd9d5c09710312a5ba5cf5ae9fae0c581"
+    },
+    {
+      "path": "app/src/main/AndroidManifest.xml",
+      "bytes": 2467,
+      "sha256": "f748787c0da9e8cb4b5c428c06e936d75db8f98fceaf8aba5e8b254e94b85ba8"
+    },
+    {
+      "path": "app/src/main/assets/font_previews/bareun-batang.webp",
+      "bytes": 42804,
+      "sha256": "296a009801bcf46cec854c9dc41672a3f0899d8d704cecf414d3e657edd99106"
+    },
+    {
+      "path": "app/src/main/assets/font_previews/gowun-dodum.webp",
+      "bytes": 35688,
+      "sha256": "c789db8bb1c764ab2cee13dc8bd5f9f2e42d4cae9967d96d0de007b7756682be"
+    },
+    {
+      "path": "app/src/main/assets/font_previews/gyeonggi-batang.webp",
+      "bytes": 41928,
+      "sha256": "e1ae0adc67b6d200d62a1b594f916d0b2c781eae4031c4a0a43bb34f397fb59e"
+    },
+    {
+      "path": "app/src/main/assets/font_previews/ibm-plex-sans-kr.webp",
+      "bytes": 35462,
+      "sha256": "4aae2179843878492805b39d6cf36e7bf31c784da8c51fb1549470b2d238f213"
+    },
+    {
+      "path": "app/src/main/assets/font_previews/kopub-world-batang.webp",
+      "bytes": 46012,
+      "sha256": "cf02ae86316e6032eff7f9998d1373afd2ac3e22e0ae52db1d3aabf726091fb7"
+    },
+    {
+      "path": "app/src/main/assets/font_previews/kopub-world-dotum.webp",
+      "bytes": 36186,
+      "sha256": "0020cef827c63c051f17b8a72e8451cfe8cd31fd10c3abcab42e09b43faaf9ef"
+    },
+    {
+      "path": "app/src/main/assets/font_previews/manifest.json",
+      "bytes": 5234,
+      "sha256": "8e7782ee3fe0850938810c3c46297f6ec347674d29fa69da39bdbf90560691af"
+    },
+    {
+      "path": "app/src/main/assets/font_previews/maru-buri.webp",
+      "bytes": 41750,
+      "sha256": "42d969f70bf54b79c974e5053ffc6bf4ff82ed4acfea58834fd2d553613ed737"
+    },
+    {
+      "path": "app/src/main/assets/font_previews/nanum-gibbeum.webp",
+      "bytes": 38846,
+      "sha256": "9a7ee6d6384dcf26a3463f37f132c42a5d79b0a69ca6e52c0441155054431fe2"
+    },
+    {
+      "path": "app/src/main/assets/font_previews/school-bareun.webp",
+      "bytes": 44644,
+      "sha256": "e688680240c8bac74a1ae9f50416f2b51ab8d8568ab008f86958dd5b53362daf"
+    },
+    {
+      "path": "app/src/main/assets/font_previews/seoul-alrim.webp",
+      "bytes": 35502,
+      "sha256": "c257aa5f5c2df97c4687608860174e5ce1600ce3f0d3475d7002556a18b2884e"
+    },
+    {
+      "path": "app/src/main/assets/font_previews/seoul-hangang.webp",
+      "bytes": 35936,
+      "sha256": "29696ad62cfac63ae5f451c83271d19a77418367b336151ba8db61cb8431da67"
+    },
+    {
+      "path": "app/src/main/assets/font_previews/seoul-namsan.webp",
+      "bytes": 32990,
+      "sha256": "5b9e90f4f2a82f03daefd51af4411686684c32eb165b075c1f4aab67405dde6a"
+    },
+    {
+      "path": "app/src/main/assets/font_previews/sogang.webp",
+      "bytes": 37544,
+      "sha256": "10c12d018c84bb5154627d2d282d8071aa8e779bc39665685bb2166cc967ab65"
+    },
+    {
+      "path": "app/src/main/assets/font_previews/yes24.webp",
+      "bytes": 36726,
+      "sha256": "ca59afd5d2d6100a1f16f4de993136ed0d4ee153be5a6f29c404d9b21141e877"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/AladinApiCredentials.kt",
+      "bytes": 3423,
+      "sha256": "1e900754f4d0e4ce3284293ae9bc8e39133cf1397302429a6948614fb0c150f7"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/AladinApiGateway.kt",
+      "bytes": 6102,
+      "sha256": "8d5bf04731b32a840f8fb7f245596fb0d6ac96c6b37824d1cf67bcb137e9928e"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/BookCoverStore.kt",
+      "bytes": 2843,
+      "sha256": "1b5403e4360dd9c0ac503561ec73c2a20e4ead637454499754b5c75fcd75f907"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/BookMetadataCoverPolicy.kt",
+      "bytes": 713,
+      "sha256": "3e4047eef71a02a4dd3f325279455867359d5711435907e3c225d8b12f80ff74"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/BookMetadataPriority.kt",
+      "bytes": 321,
+      "sha256": "337e2ec12939c67c4ef30261e0b1a92bce6cdfa2bbeefed39d49c5db137c6917"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/BookMetadataSearch.kt",
+      "bytes": 19648,
+      "sha256": "530a91c3d1930ff3f4af8b6aaebdd57a81d895cfe35a90a50d096498511f2d56"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/BookMetadataStore.kt",
+      "bytes": 10593,
+      "sha256": "c518c3f8a4a40536fd90242c81dbec8812295b1d4b5710c4c87822177a6d133d"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/BookMetadataWorker.kt",
+      "bytes": 7382,
+      "sha256": "ecc2ef230a1964fb926c222f0a5518960538028e3e7005738a99940b226563da"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/BookOasisCatalogWorker.kt",
+      "bytes": 3845,
+      "sha256": "9727754b434a118f802eae2ed1611797c1a2a785b6a5440d492c62118790162d"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/BookOasisClient.kt",
+      "bytes": 14811,
+      "sha256": "e5437eba5e201f5137f815079be74b66a9f2991403d71dd5576b0b82164714ac"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/BookOasisCoverPolicy.kt",
+      "bytes": 470,
+      "sha256": "a1001f7482cf4dffb91e1c53a3c9a4ba1d7057029e8a361f4234efd5b3f850db"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/BookOasisCoverUrl.kt",
+      "bytes": 1073,
+      "sha256": "a1d7618579e184f13060f980ef7d679b0ca7feb80026dadba3ae8aa2f37e1940"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/BookOasisMetadataDb.kt",
+      "bytes": 10974,
+      "sha256": "7496db1d3bce86121f3e4000b07ee5ca75244051dd1d5b44aac0e6d14fd2f789"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/BookOasisOpdsClient.kt",
+      "bytes": 20082,
+      "sha256": "c9be5f5ceb8d6820ef69e93f9ba6db2dc31547558085dc95763b30ddeb72be2b"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/BookOasisOpdsParser.kt",
+      "bytes": 4762,
+      "sha256": "46c574d690b7f8a65d75b8cb1bcd01e89dc5b6e9d41f21eb0ee93f4e59ca0c7f"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/BookOasisPagination.kt",
+      "bytes": 1604,
+      "sha256": "10ed4617549507b34abe5987f5f8af64b99f8c8175a5b0a223c05b0b21d3e130"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/BookOasisPaths.kt",
+      "bytes": 2570,
+      "sha256": "64298f1edca0f681f238e65cec14b2db2cd11a5eefefe17289d27bb24bc409be"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/BookOpenProgress.kt",
+      "bytes": 662,
+      "sha256": "da11a334f4fb19aa6c8e8d969b22af0d05567f225466194046f78ddfde4f04ca"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/BookOrganizationRules.kt",
+      "bytes": 2984,
+      "sha256": "c865b2b748f6e26068b666739dc27c50597430376f603c9c9f449d52a84d2433"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/BookSizeFormatter.kt",
+      "bytes": 453,
+      "sha256": "35ac6e274d15057041eecf78dabf0f701c21bbf0e3df22bafc1a72d9025130ec"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/BufferedRangeReader.kt",
+      "bytes": 1699,
+      "sha256": "3b71d790b521d935a86cba1f26ad8648edeb04da027e8e230b6f3d0fc0d0b208"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/CachePublicFolderNames.kt",
+      "bytes": 1153,
+      "sha256": "4648d4e1c5ab6d7be3ca9653a9df3cc6c4176f43a8196bf418e6bc0d904a7196"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/CacheRebuildPolicy.kt",
+      "bytes": 310,
+      "sha256": "846b2ced8264b1261e802db3778b2155e229a89dc983da494d07c03b27d94be5"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/CacheRebuildProgressStore.kt",
+      "bytes": 3337,
+      "sha256": "11e7c7175b9b29eb4bfbcefb0e7502d13984ddb6427d41167aacd3b56c7273aa"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/CacheRebuildService.kt",
+      "bytes": 15897,
+      "sha256": "4a94124f06f297bda6983805cb3f6899b053efb07f765a51ef6e303b9354a728"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/CacheUsage.kt",
+      "bytes": 1425,
+      "sha256": "4c49beb115fea588b5138b34b320b224cb677c5a6c7d3481122e2fbf4c641dd1"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/CatalogCoverKey.kt",
+      "bytes": 407,
+      "sha256": "e7e97c5c7a9c3542df8c54fb923be65f61d9a804e8cc26f661b6d9835ce08255"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/CatalogCoverLoader.kt",
+      "bytes": 6506,
+      "sha256": "4e9fcb08d67dee8e9e564540cf4c95cd1dcb391c294f4598c393228e727da4a5"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/DoubleBackExitGuard.kt",
+      "bytes": 379,
+      "sha256": "5050984663758269a0b8b3dde7bff89d38b8a86b1976181260eb241d2fc6aa78"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/DownloadedBookRetention.kt",
+      "bytes": 805,
+      "sha256": "0373980a73f5afe6417741f2c0ea3c780d957fa6332cdd3575107fda8a22e635"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/DriveAccess.kt",
+      "bytes": 2822,
+      "sha256": "b8e0e209e8ce0976d6a84b867886264ef3016e30fd5afa4f9a32c2df2d0aece3"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/DriveConnectionPolicy.kt",
+      "bytes": 826,
+      "sha256": "ead29a66d46f94c386b76f414c1ba12552261acfbc51c2484c6e76286220de55"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/DriveFolderPickerPolicy.kt",
+      "bytes": 2018,
+      "sha256": "a380750066d512db5a81c7ff9f45519b696d9a1bccd5c6ffb2fa01bed1ffdf9d"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/DriveWritePolicy.kt",
+      "bytes": 1282,
+      "sha256": "3c6b2e893021f11e1184ec38778e481da805c0bfc8b2368e423975a85a026071"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/DsCloudCatalogClient.kt",
+      "bytes": 5239,
+      "sha256": "51ca99b37f9fe0f658bb40eedc87c4ba65fda82c866c70c833ddd4ff0c79ba5c"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/EmbeddedPdfCover.kt",
+      "bytes": 3176,
+      "sha256": "b1ae167d3fa77d66407e86b1810bed2d4374974e1587a32a59c1c57c14edcbfd"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/EmbeddedZipCover.kt",
+      "bytes": 10799,
+      "sha256": "8f40c7d5e3a70de4362e15ea482fa4c8fda527832e26e45900a7866fa8ea1dd4"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/FolderThumbnailStore.kt",
+      "bytes": 8529,
+      "sha256": "a1ddc5330540e77d4dd45038a7c762eee9a39f2c7354945da0172821033e3324"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/FolderYamlExport.kt",
+      "bytes": 1594,
+      "sha256": "2269fa35f533ab0cf8ac0c434165d207ef89717aa2886644b658e795b18c9ac3"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/FolderYamlMetadata.kt",
+      "bytes": 13580,
+      "sha256": "badf66243aaecbe618b520834591ddaa9a9d54a48c130a7cee75a352f728790a"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/FolderYamlStorage.kt",
+      "bytes": 11144,
+      "sha256": "e52a03da139b1379cc8740d084276556a37236b999f0d1f6745d0391c50e7432"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/FolderYamlSync.kt",
+      "bytes": 9817,
+      "sha256": "c206474ef4636572a36f2b5310ec1b0729e9944a47e96eb6b2c5c1dcde032249"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/FontDeclarationPreview.kt",
+      "bytes": 579,
+      "sha256": "6b125d6982f54d9bb1c26b56f151a31743f001afeb971803566e1b3934eddcdd"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/FontPreviewActivity.kt",
+      "bytes": 4699,
+      "sha256": "ac7f1c2b9272f4d8673e167751912aca3ce1269a07e9868cd1b11433fc3f9881"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/FontPreviewAssets.kt",
+      "bytes": 1471,
+      "sha256": "5a61c314bd5b0cf668e8be45387ff9541e54e7675b9b5f83a24fc80e988384b1"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/GoogleDriveAccess.kt",
+      "bytes": 16206,
+      "sha256": "801a5ba75bddfd74911cd91530f49acf73cb5494eb306ac49503e0a699183ae1"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/GoogleDriveSignIn.kt",
+      "bytes": 6817,
+      "sha256": "0906f29baa37407c70a956a5d65aa191b81e5b1ed1e0a10b6b0c6a8af6123d1f"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/IconContentBounds.kt",
+      "bytes": 943,
+      "sha256": "34242fdc392f521abba0c1976e2c8596c739ee1dd964e109008e894d6272898c"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/LibraryActivity.kt",
+      "bytes": 161516,
+      "sha256": "e5d798bf4164eeafa1fe99636c3a0f08b01fb955842701ce67932f27233237d5"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/LibraryListingMemoryCache.kt",
+      "bytes": 1905,
+      "sha256": "47fca93af1838e5ece16b3be85935409164267de7b174c9b8cb4ce8ac7eeb34f"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/LibraryRefreshPolicy.kt",
+      "bytes": 311,
+      "sha256": "bbbd43caaca84f6d5990c80d1f0527f27eb2c4649cf5f0b6232f449fc6cd1ba0"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/LibraryRepository.kt",
+      "bytes": 99678,
+      "sha256": "f0f8d62e80307f2b375a3a5b54d4b0a9a182c65d0e58540285ce2be6938a6a65"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/LibraryRepository.kt.before-folder-browser",
+      "bytes": 20005,
+      "sha256": "af9a6e8c3b76945a23f94bdea3917b36bc1d42e9785e54f0d965996aa7e619a2"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/LibraryScrollPolicy.kt",
+      "bytes": 483,
+      "sha256": "f5240e57cc58deff927f7a05b8bf80bad890c6f0ffba19da01f5f9cb09339a54"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/LibraryTitleOrder.kt",
+      "bytes": 3120,
+      "sha256": "1af97d66f9b05196495a8ba45f914d81de61a8bdff04c541ea0590516f11332d"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/LibraryVisibility.kt",
+      "bytes": 668,
+      "sha256": "170252191ffa5f35a45f0e050faddfe98a06dedb40abddd3b501064e3e969d34"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/MetadataFileWritePolicy.kt",
+      "bytes": 1181,
+      "sha256": "64ebb10d363cb5c935eef2df0534cc2cfaf0c46f7823da9fe1d2ab3c4ef78344"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/MetadataSearchPipeline.kt",
+      "bytes": 3794,
+      "sha256": "941c356c516d7af29aa3824c257086e1aea55272dcc757bb5f1cfbddf65e2bc9"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/MetadataSourceBadge.kt",
+      "bytes": 1547,
+      "sha256": "02fadf7a88b8a2151c5bc72b13c3f73dc0ba1ed3925cec5ac0a52626d88c6115"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/PersistentLibraryCache.kt",
+      "bytes": 25941,
+      "sha256": "981cbfda8eec9e20f4ce0fe75f8cf46bfcb1722bb0553494ac77e04f64b522b4"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/PublicLibraryCatalogClient.kt",
+      "bytes": 7998,
+      "sha256": "650c076e2ec06700ad53d7bf62e10b3ee98adc9495cc03ccef6f1685afddc144"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/RangePdfRead.kt",
+      "bytes": 2346,
+      "sha256": "aaab35fe65174d8db35ecd71eaf4263afee0527f05b1422ad7026942d3ae9a6b"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/RcloneBridge.kt",
+      "bytes": 11604,
+      "sha256": "d44297e099660e48b3237d24b2580301874d9cad503fcaf836e1d410f79e29e7"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/RcloneDriveOptions.kt",
+      "bytes": 1449,
+      "sha256": "8fa901469464c23c1375dc519622d1a2dd7134a4e550435fbc6949b2000ddde1"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/RcloneGdsCredentials.kt",
+      "bytes": 594,
+      "sha256": "2ce7f45876a4f20a17a06e3d266f3f0d5186917caa47ae348697db69c6467dd8"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/RcloneModuleRemoval.kt",
+      "bytes": 290,
+      "sha256": "312b99d220d1e07f019a9593604ac36f7fabd76070c2df993a46debcd1b6ba8a"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/RclonePluginClient.kt",
+      "bytes": 8613,
+      "sha256": "3e2473fdcefd2649f686a57ea6c4c8c4cfa4f15ac0b7be896ec42deee3b44747"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/ReaderStreamProvider.kt",
+      "bytes": 9710,
+      "sha256": "c895f386463bc543e133e2f6e1721908b824c5089af6942a5046b8b1f2d95245"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/RemoteArchiveReadPolicy.kt",
+      "bytes": 581,
+      "sha256": "72fe2fb15bf40b7bb59bb3cca6d0c5d0a674476fb4f98a783593588cdafa8353"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/RemoteBookFolderFilter.kt",
+      "bytes": 3202,
+      "sha256": "29e19fd5bec80143b2bdd8671ea88e191af419f33e813b17388aed27bc4b1f9f"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/SeriesVolumeTitle.kt",
+      "bytes": 2809,
+      "sha256": "543b74f62c0377b623fc20710d829ff599e2b85548c06795db6e825c66faa7d0"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/SftpStorage.kt",
+      "bytes": 5561,
+      "sha256": "a272778f714841c048d858f105999b844a8879b5c9cb5d9e112eb8f36587aafe"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/SmallCoverJpeg.kt",
+      "bytes": 1413,
+      "sha256": "4afef164c7f43f937bf084940918906db36d7b9e40b8c6d9425686acfca9d7f0"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/SourceIconStore.kt",
+      "bytes": 6664,
+      "sha256": "2d4b0588400f3b1638ebe9246af22fd86f42fcfffddee8b1e9dcdeac192cc1a8"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/SplashActivity.kt",
+      "bytes": 2675,
+      "sha256": "706f39b9b3db9d54cbb5618f3f4656b5fa54b6da68f5e4c6b1b7ea51b4db992b"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/StorageIcons.kt",
+      "bytes": 6282,
+      "sha256": "c78d818d5f15ca22cdedc47e30fb7a5229644b11498c401799b5ed4c27150f34"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/WebDavListing.kt",
+      "bytes": 4836,
+      "sha256": "2417420d07e3b3443575c9c250c05ebf49278319b67cabb4835055a82bee714d"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/WebNovelFallbackClient.kt",
+      "bytes": 12001,
+      "sha256": "0d5fcf99b3a341e64543496611839d90ef234028fa3f9a4d73ac691231c782cf"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/YamlReadableDocument.kt",
+      "bytes": 5989,
+      "sha256": "fa755299b979275834992f8974a09fe3e79d31f6caa094ed8aaccc40318a9d96"
+    },
+    {
+      "path": "app/src/main/java/com/ckchoi/ckreader/ZoomablePreviewView.kt",
+      "bytes": 3438,
+      "sha256": "352cd9a039c4b9b6a79d32a27e309cf414e0d9e86546602a0a334a3616900d29"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/icon_engine_onnx.png",
+      "bytes": 20389,
+      "sha256": "9e1dcd8601471abf2f51046acf96b99320d40825a8d264f5ab276e2f2ea4436e"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/icon_engine_rclone.png",
+      "bytes": 16241,
+      "sha256": "06a5eafa178ed7b30368c97de365735a9dd8f141957a15c6ab73fe7ad4c1a39c"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/icon_engine_selvy_i.png",
+      "bytes": 9051,
+      "sha256": "c0754915facd9b5f3af43ad5c01f1947ebf69a8a95dffde738149ff8a73da5bd"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/icon_engine_selvy_ii.png",
+      "bytes": 31221,
+      "sha256": "424ac3287e247ce4ea83d298fd14a45429a2f937c5888d7bd83dffbfdc25e656"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/splash_highres.png",
+      "bytes": 1450583,
+      "sha256": "07a374f3c3afe46c7ec8ca71f0246c4e30433359b883ca0371c0278a5a2a7997"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_akamai.png",
+      "bytes": 16231,
+      "sha256": "fa79af96cfa2bd8fd70a3876e0ad13a640320c6968499356196d9087ff5986b9"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_azure.png",
+      "bytes": 70826,
+      "sha256": "0357d5432c965fafe7d9be7bec68a90cb0e6f35edf7fd3294ea5a2480ce0bc0a"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_azure_classic.png",
+      "bytes": 18647,
+      "sha256": "4adf8daa96e38c78325ce00239e4adf91ab1dbb136cceb61c84c39ac1c4ff238"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_box.png",
+      "bytes": 32685,
+      "sha256": "c9bf942838516690b3f3d3ffc4ee554c20585dc31ad806254ab834b9575fe9b4"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_cloud_arrows.png",
+      "bytes": 30530,
+      "sha256": "dfaf311765c884923c1a158561a95d8be772241fc2c1de305d969bfdc8d95324"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_cloud_blue.png",
+      "bytes": 22744,
+      "sha256": "78a8076fb4b6eba7a0769107be355bd4c34489ab9cc53af82a2aa9bf77fbb4f5"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_cloud_chat.png",
+      "bytes": 46664,
+      "sha256": "64d2775513a7034d4cc928a1d6f949468d7aeb8f82c21c64f0e0b81896f333f2"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_cloud_code.png",
+      "bytes": 5171,
+      "sha256": "2c44c56f3fe038c68584bddf1928fc9229aec59dbdf548e14a288c704b7f0faa"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_cloud_cyan.png",
+      "bytes": 51961,
+      "sha256": "2c653fe72184c84f3946b0b3e07c0f95173aa9b47b6a1d260b0188f069439fa9"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_cloud_network.png",
+      "bytes": 25059,
+      "sha256": "1001a751159eaa90cc0b31a068d28611d551c1bb35b4d8d4a023c9918760b62d"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_cloud_purple.png",
+      "bytes": 41726,
+      "sha256": "c76720431be00bb8685cd4a054bf0fe733da0aa5c82b7769c5680431d40b3197"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_cloud_red.png",
+      "bytes": 9471,
+      "sha256": "b4fefcd8e893e77cbbf9da369081f3bad1c38d86dde622a89ffb0c707b883c41"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_cloud_sync.png",
+      "bytes": 21088,
+      "sha256": "3bed948e7c94e9029e096e740ca2e96a69340bef3651210c02d8e42a9ebcbf84"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_cloud_sync_square.png",
+      "bytes": 15520,
+      "sha256": "1e495c3ea2b2b47fa6fbe24b0ca0e366f279ca8e9be89d60496f53f0b4b9e8bd"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_cloud_transfer.png",
+      "bytes": 38545,
+      "sha256": "8dfc378b0a4ade9072005a9384f13c7a3aa7c595abe1f37e9c2719cb7706c5f3"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_cloud_upload.png",
+      "bytes": 15410,
+      "sha256": "c10a5f636aeafb034c6fecd83d657f58ec8b8d07c4d68ad94760785db111c025"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_cloud_upload_sky.png",
+      "bytes": 35928,
+      "sha256": "f995be06b89dcba6ed1cab06aa23617d976b54e0baef4ee39aef8b4d048c1d70"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_cloud_yellow.png",
+      "bytes": 17991,
+      "sha256": "458fa4be3a4a9ab6bab95850b84d633bc2276f4998b0eb61ba69c453bad55cb2"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_cloudflare.png",
+      "bytes": 5050,
+      "sha256": "ec7a1ca2a30528d9d1888c3b43b2f50d292229e5ec1ff1d88d48a70d52ad72f6"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_cloudinary.png",
+      "bytes": 37878,
+      "sha256": "9c338a54201afb2302065f0534fff09f9738bb2369b8b3c8768d7950d02aa718"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_disk_blue.png",
+      "bytes": 19824,
+      "sha256": "9887a539e9e9f1e351e56e98f1a0615ca1b242b4694940d4f1a28c6c61adfc4f"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_disk_cyan.png",
+      "bytes": 20787,
+      "sha256": "cd680225abe6f6f005d1ac45052979d23612209cbf082969dfc17dc43d2c7705"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_dropbox.png",
+      "bytes": 21175,
+      "sha256": "429cc3aa02ea97a157330975d99afed51bfe2b58cb2877257b34778c440c70db"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_ftp_badge.png",
+      "bytes": 65017,
+      "sha256": "3f1314e2625c99d25fda339d72565a72fe54f189c5412f21ad91d840518ae209"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_ftp_folder.png",
+      "bytes": 9678,
+      "sha256": "c3e405a3756ebc36af7c5af0b912061a04f51307de923082a7bff94434466cc9"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_ftp_network.png",
+      "bytes": 8036,
+      "sha256": "0b55ac44d7f645a6b17b388ab81a2484e388b3472bb4b481ad822819d9470867"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_gofile.png",
+      "bytes": 27700,
+      "sha256": "9539a2c2109ccc2a32196e7e84a8126392ccd4652a75d1d053efa1e7024c1b21"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_google_cloud.png",
+      "bytes": 53497,
+      "sha256": "0c91eee271fe323e1689d6c0eb2cf8ffb87ffbc8bbf39feebe7aa3ffc3da369a"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_google_drive.png",
+      "bytes": 19395,
+      "sha256": "26a2af1205fe7a3a70b36604f1cf465d7582228cf7483085a700b5b279dc4b7a"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_google_photos.png",
+      "bytes": 16535,
+      "sha256": "5fb68242b901d020ce3666e08638445013f542a866214585f435175c6abcdd64"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_google_photos_classic.png",
+      "bytes": 54093,
+      "sha256": "0c274426584f5fcf3f72d507e646e0788bba7c5fd6f381abb987fddefa1fb8c1"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_ibm_cloud.png",
+      "bytes": 120898,
+      "sha256": "aefd8f94c30d991567fa16c1f9ae2b989415cbcbf95c6f3ad069afc25aec1689"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_mail_cloud.png",
+      "bytes": 25573,
+      "sha256": "594d33c491a7cdeb5f9597a165c97837ea07934098416b225dbfed61c5f1fc5b"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_nas.png",
+      "bytes": 24748,
+      "sha256": "f09283e6f3ede66300f4ed087ddb2ff455c395b1c52a6afdd48bd83bf2e73aed"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_naver_cloud.png",
+      "bytes": 56250,
+      "sha256": "b99287450bbee57d24e34f1e00281d7ae52862a5a48ecc6e1dbb49f35b99c51b"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_naver_drive.png",
+      "bytes": 22962,
+      "sha256": "0c6f34037cb781a9de20a893e33e21cbb063690a0ec807e4839b0f42d8ad2ce4"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_naver_mybox.png",
+      "bytes": 30965,
+      "sha256": "9899f12339b70d40aac0d3f6b77c90c1dfae4ae3e4780a8fc37e9d206f17f244"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_onedrive.png",
+      "bytes": 110181,
+      "sha256": "65d335abc44edc526a0562ae44aadc37393b1b55c86f1e572a3a486d4a4e8201"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_oracle.png",
+      "bytes": 98056,
+      "sha256": "98efda2220be39bf7d0c3b0db3b78058503d8725cfc02e76929347c4395acf49"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_pcloud.png",
+      "bytes": 66514,
+      "sha256": "402d439a5e379337e878a905c719a64c3a2d76159c51ecf351a2407bf7179402"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_rclone.png",
+      "bytes": 17126,
+      "sha256": "f9eeec841a38289c7dfd8b595a63ebed2c7f793a8afea6576e9941045f0753eb"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_red_hat.png",
+      "bytes": 27652,
+      "sha256": "d35fee5533b557dd4826f8b5a7fb65c5c809955a916b5d574c81f6ce0338f490"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_s3.png",
+      "bytes": 11033,
+      "sha256": "fb81d742d4568fb58648d5bdb68b2e8d94ffc8aa29b21234aa7484fbb93edbe9"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_s3_bucket.png",
+      "bytes": 28884,
+      "sha256": "4d1b62cc68227483706ee8921fbc7a5e68c64bd55641c4e11bbf5f04c94d050a"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_samsung_cloud.png",
+      "bytes": 32734,
+      "sha256": "b633b26220a8c3abaa1bc9de45c978c13e2f1f4494d1722942c2846c30f7cb56"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_sftp.png",
+      "bytes": 30038,
+      "sha256": "993ea4e50acd82a57c68be6be98f82bb646d1996e03ee673dfb6761d3f0cc040"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_sftp_secure.png",
+      "bytes": 20715,
+      "sha256": "462f6c741c86d8e6c189b414fc9fc6d1090628bd8c97104f96ca5dd5bc990cf7"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_shared_folder.png",
+      "bytes": 9379,
+      "sha256": "7a058ff30fe61eb995fb39c9d59333cca7ab93f310ea1f58e044d03e7f797729"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_shared_folder_outline.png",
+      "bytes": 10251,
+      "sha256": "dee4bc033960c2ca9fd66f344acc183d96dc44eccf89225a41a935570a744e58"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_smb.png",
+      "bytes": 16643,
+      "sha256": "88668b66f25c10903b81e3279b87d0cecf96f6e9e70f45b081a6f6de2d221bcf"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_storage_color.png",
+      "bytes": 11982,
+      "sha256": "fa632015467d39c3be56738ed01f7365889b58fb61979a02a2fba17958adb133"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_storage_red.png",
+      "bytes": 4845,
+      "sha256": "6c2d998cc75000249bf54e34d0a416fa3e7e1a8e98cc3f805ebcef322e090282"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_storage_stripes.png",
+      "bytes": 12384,
+      "sha256": "0add98f50b71962e51025f29a038445030a056b399b1387b62557cd8af0fb6a0"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_user_baidu.webp",
+      "bytes": 2762,
+      "sha256": "6668da7777ca02f037f16067f00242db4cb7344faff8e383e0500d454da869bf"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_user_blue_folder.webp",
+      "bytes": 776,
+      "sha256": "d471d8f9f374a211cf5bd0f26cfed461911edd88ae43a1b441796703089aa2ca"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_user_blue_smilebox.webp",
+      "bytes": 1444,
+      "sha256": "d0401428d67cdb19872fc532d7979e85da4bc48ce17be6cc604905167f4229e1"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_user_bookoasis.png",
+      "bytes": 4623,
+      "sha256": "c314351e0f577d699eb1deb92b700335aa3d9aa7651360d4635ca61bc30d100e"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_user_five.webp",
+      "bytes": 1872,
+      "sha256": "3e5232a42fbd3868897faf74715ea5ae4b6e2e8daa52391280356bcfa2ee24be"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_user_infinicloud.webp",
+      "bytes": 3632,
+      "sha256": "51970358d2fc5e963c0b3554e4c48446a45e7e8fd211ca2f00c727f930fab2a6"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_user_orange_folder.webp",
+      "bytes": 1076,
+      "sha256": "80b6c6c990792a896c857088175d16438c16f473cd846a4730800ea36850bbff"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_user_terabox.webp",
+      "bytes": 2230,
+      "sha256": "3ec80a2a0b8e4cada08789268410cfb0473287213e4a76b70fbda0f4bab2fb37"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_user_webdav_cloud.webp",
+      "bytes": 1992,
+      "sha256": "09acdf6d5fe1266b963ca661f6041930d9945daa61b8f121eccd9d7280ab6ab9"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_webdav.png",
+      "bytes": 92502,
+      "sha256": "26ba7947755a3bc6c91e52e9210be13c245909b6af1a9594c285f658b1d8c148"
+    },
+    {
+      "path": "app/src/main/res/drawable-nodpi/storage_icon_zip.png",
+      "bytes": 88902,
+      "sha256": "5fbeaf5978c0b7d83c6b91dfa2a2e4a61ac161a5a47f326e84f80c0b52664f4b"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_add.xml",
+      "bytes": 308,
+      "sha256": "8fb789c05cf78a69d4a7a0689514502c1f208a861077991bca1540e32ca027b6"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_arrow_back.xml",
+      "bytes": 335,
+      "sha256": "6dc963ba30aecb7c926cfc15792c2b21e1232a5fcd17543a4de3a9c9c2ab192f"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_book.xml",
+      "bytes": 437,
+      "sha256": "acae07d755e9cc1f049ef4bd39a37d842152641e9e9e4ec5f3f398a3be330019"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_chevron_right.xml",
+      "bytes": 316,
+      "sha256": "55669b1811acb545c44d87eed99d8f940d68e3f9a21d01e2d6e2bc168b8b8bb7"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_edit.xml",
+      "bytes": 398,
+      "sha256": "e2c1cee18e4d58790d029955fa016409280c7c49382f9991d1bfcc5354f96613"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_folder.xml",
+      "bytes": 371,
+      "sha256": "f7ea2579d960ef4976e5b9ad3d73a7534df378aad425fdfae57f301bba12c249"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_launcher.png",
+      "bytes": 211525,
+      "sha256": "4e1be2534f98ae81b6c5f539c9a882048fd2adbfa20e05cc1b0cbd977a0a9daf"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_refresh.xml",
+      "bytes": 404,
+      "sha256": "ea6692b109e01af190db45e07f0fd765380d9466823797eade63c40955d18313"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_search.xml",
+      "bytes": 553,
+      "sha256": "95c06088ed9ad0ca35b613f702137600e3dc53e8333cf2092ce896cb596976df"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_settings.xml",
+      "bytes": 715,
+      "sha256": "ef3a05bd8488d8a7cb40fb7fa2ee4b9469ec12f4cf98bafc2eecf931adf6373a"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_storage_bookoasis.xml",
+      "bytes": 337,
+      "sha256": "f0d9fae29a208a29fa54b27924a2aff12da3a53e20b9f703d4ba8ed577717bff"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_storage_drive.xml",
+      "bytes": 330,
+      "sha256": "89de5dee6fe0bc663e630053633ca8ef2dc0b7224e53640022065fcc81aa5d61"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_storage_ftp.xml",
+      "bytes": 332,
+      "sha256": "46f2f55ce82da4381967c73b3466a56e88b576e9f2c69b8e2e97498a92cd1290"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_storage_local.xml",
+      "bytes": 317,
+      "sha256": "f82485d8e51b67ef6d227f622844ec01248327fd80f818213df4745eeb8498d7"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_storage_webdav.xml",
+      "bytes": 352,
+      "sha256": "4b938b763a98030b6f9f89ff762bdba10f04b27752456c01b93934d6e414c643"
+    },
+    {
+      "path": "app/src/main/res/drawable/ic_voice.xml",
+      "bytes": 362,
+      "sha256": "9ba2600f3b500b73b4684149f29635b864f818a89e36267c4cb4c2f5872ee212"
+    },
+    {
+      "path": "app/src/main/res/mipmap-hdpi/ic_launcher.png",
+      "bytes": 11667,
+      "sha256": "9eb20bbd01ceed9988efdab6a99c10b747e2870c32837e135d6a9e8134bbf70e"
+    },
+    {
+      "path": "app/src/main/res/mipmap-mdpi/ic_launcher.png",
+      "bytes": 5704,
+      "sha256": "c3a8ffeefa5b85daf66d3fbfeef136cfc20bab650547478666fba2cec312ff93"
+    },
+    {
+      "path": "app/src/main/res/mipmap-xhdpi/ic_launcher.png",
+      "bytes": 18357,
+      "sha256": "9a3beff159decc4a8062ae1aca7dfe317da5a15a8587e89ed79c6b428b71c037"
+    },
+    {
+      "path": "app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
+      "bytes": 34397,
+      "sha256": "c9121edde2c43ac894d772807791169c7abd57633ec6732ac4c5da27caa580b4"
+    },
+    {
+      "path": "app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+      "bytes": 52711,
+      "sha256": "b2d33b7ff67ac68aea9b6b29ba47fb04f5c9ce4f9ae098e832fc307efc901d23"
+    },
+    {
+      "path": "app/src/main/res/values/strings.xml",
+      "bytes": 66,
+      "sha256": "d74e455148d56a0a72b482ad6fe286918e7eaa5f119c162fa0c3216d2fe0369d"
+    },
+    {
+      "path": "app/src/main/res/xml/network_security_config.xml",
+      "bytes": 347,
+      "sha256": "e92cf9165389140ab705d1ed6b603a307ead65313b55e373ccd37ce8117e813d"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/AladinApiRoutingTest.kt",
+      "bytes": 2051,
+      "sha256": "96e0a15c5a9f10b7a5e09b9c268a04323042520afbd91a77cf5cc155ac5a1524"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/BookCoverPolicyTest.kt",
+      "bytes": 783,
+      "sha256": "09a09b23438d158793b3f89fb7f2a39f5ba589897f03fcbb5ebbcbd5eee3b308"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/BookMetadataCoverPolicyTest.kt",
+      "bytes": 1009,
+      "sha256": "37d6b139827db7a74972cd27b4ee370c7930834c12f7629a4d09b2a0476c720d"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/BookMetadataPriorityTest.kt",
+      "bytes": 692,
+      "sha256": "f9f903362e886fcb8135d47ae23a68278315b4d093d14aa2bfe66e3859e0875f"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/BookMetadataSearchTest.kt",
+      "bytes": 4069,
+      "sha256": "c7542966fb38fbf8b42ef670cb81fa79abf4b446902d4822ed64a88f1460221b"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/BookOasisCoverPolicyTest.kt",
+      "bytes": 1410,
+      "sha256": "b37b99543d94ff0fe4eab64a8a765a4c69360729a70713368ba1a5e7390403c3"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/BookOasisCoverUrlTest.kt",
+      "bytes": 2044,
+      "sha256": "b3d14f8b98dc9c7160813516550ded22cf1e0696081e4989cfee18c07445de13"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/BookOasisLargeDownloadTest.kt",
+      "bytes": 4185,
+      "sha256": "d1f0871976631abd679006ccc3d870686f3cbe86016e13bb349bec993e09c8c8"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/BookOasisOpdsClientTest.kt",
+      "bytes": 5066,
+      "sha256": "0a601e3e7088efe0ddc5ff15fcdbe4e26b1f69e18887fcf21d7c951ee48df5ab"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/BookOasisOpdsParserTest.kt",
+      "bytes": 2955,
+      "sha256": "855dd4def28fdec812bffb4509ff1348ae09849fe7bf28db310c5e3ca971b052"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/BookOasisPaginationTest.kt",
+      "bytes": 1864,
+      "sha256": "e57b662fde8aa60152352bc6f7d0d93f9fe025ba7a7b559f0b103245e2702d80"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/BookOasisSeriesRoutesTest.kt",
+      "bytes": 1656,
+      "sha256": "5bd9cf29dd16382a8be06b90fef3735607739847d39623206b6adcfc29e868c4"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/BookOpenProgressTest.kt",
+      "bytes": 846,
+      "sha256": "3c5bf888fc7d83102922a56c79160f87873a26042a6ceefc23f3a12b970904f3"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/BookOrganizationRulesTest.kt",
+      "bytes": 2993,
+      "sha256": "2f9965aced7adc5eace20444562084d1a9166ebbba896372bf1c9569488b801d"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/BookSizeFormatterTest.kt",
+      "bytes": 570,
+      "sha256": "217de97c4a262a18622b854cf6fc28620780d74d7590ac47fc7085abd0f0a561"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/BufferedRangeReaderTest.kt",
+      "bytes": 3035,
+      "sha256": "ac82e5fcb5b077bbbbd18400e51db13f521a2d3875d2ff1630ed97ee77ef0b62"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/CachePublicFolderNamesTest.kt",
+      "bytes": 883,
+      "sha256": "312c4d67d77368f68d8deb32d58cc5dce7adaa6b03fb17a70480921dc1ecc2e1"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/CacheRebuildPolicyTest.kt",
+      "bytes": 806,
+      "sha256": "41b4673d14d5c77839b30f35302100acf89182150ca5563855f14b07bfb85d04"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/CacheRebuildProgressStoreTest.kt",
+      "bytes": 2613,
+      "sha256": "374ee02e220cb3d3cea741456d7c3e1f865c613bae7ef3a1a7e733d4830b2d14"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/CacheUsageTest.kt",
+      "bytes": 1350,
+      "sha256": "102d6c30909b5fb5f7a7c9390b144f1dc94f47f401f87489c36ab03452a7b3ad"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/CatalogCoverKeyTest.kt",
+      "bytes": 902,
+      "sha256": "dc182d14963ccdbb080be3faa56bbb9b322faf7929c579a623f02b256f57bfce"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/DoubleBackExitGuardTest.kt",
+      "bytes": 707,
+      "sha256": "fc502e3160cea065b8bded03ac3949f045c3c79244eb1ffd8b14412c2fb6e7a1"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/DownloadedBookRetentionTest.kt",
+      "bytes": 1559,
+      "sha256": "16ce25deee4e68b529a7f03ad0b3efb07354024b3295840962bcea44a9dbef05"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/DriveConnectionPolicyTest.kt",
+      "bytes": 2113,
+      "sha256": "125504ae0fc85f90290ab2279ad4466f978f5e4cd63a9fa1a9986db8320d00ec"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/DriveFolderPickerPolicyTest.kt",
+      "bytes": 3576,
+      "sha256": "9f075a2254bef3661e565e7b14ad33d06a067e7170073c178406c3d8e95b2394"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/DriveWritePolicyTest.kt",
+      "bytes": 2142,
+      "sha256": "e02715a9d9922784acbe89bc817d62a26234f6db393b4589dbdc28c8d20c77d1"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/DsCloudCatalogParserTest.kt",
+      "bytes": 2789,
+      "sha256": "82ad01d195ea9107b79f09743d63b6b5d0982c227e41f7149e9b84dff82d5293"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/EmbeddedZipCoverTest.kt",
+      "bytes": 6088,
+      "sha256": "fd3436791c006a5c78871cbfd04f8f3f3e45c66936c72f20a55b8debd079af2b"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/FolderCoverPolicyTest.kt",
+      "bytes": 3697,
+      "sha256": "9f7339ca7bf7cbb63549edca20bb55d4653cb901a8f127f059bbd79173fe6926"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/FolderYamlExportTest.kt",
+      "bytes": 2206,
+      "sha256": "5ebe9ac8981a2008e2a62aa5a93283e09dd0cfa7d81c3ee418d41c968399b494"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/FolderYamlMetadataTest.kt",
+      "bytes": 10751,
+      "sha256": "5a1daf3c575dad13bc46f6e23c05258580b2aeab9bc49a844d5007c6b5403fcc"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/FontPreviewAssetsTest.kt",
+      "bytes": 718,
+      "sha256": "212babed2a8db35cf1304f7b6e82c808be5af20100024d3aacdb75b7bf038c84"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/GoogleDriveAccessTest.kt",
+      "bytes": 9658,
+      "sha256": "3935de657f4282f3eb3334bd82a200cc55408211bcc16620f79646653f11ade3"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/GoogleDrivePickerThemeTest.kt",
+      "bytes": 1591,
+      "sha256": "aa8f1aaeebcb07f8c376cc5a560735104dc8e852a64d1207c060c81b445eae83"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/GoogleDriveSignInTest.kt",
+      "bytes": 1941,
+      "sha256": "57212c49bee121035c0317a99fbd058ca18e9ed7a0a59c0f14531edd9aea94aa"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/IconContentBoundsTest.kt",
+      "bytes": 720,
+      "sha256": "9ad5576f892c1bb8fdb2155e22c90a6ce25fb75b7cdcd70a5d1dcf79611cca15"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/LibraryRefreshPolicyTest.kt",
+      "bytes": 1039,
+      "sha256": "dbe37d644e33f1fc089c9c97a3d7dae2c69cf7adb8286cf0f01a990a5adc17a1"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/LibraryScrollPolicyTest.kt",
+      "bytes": 963,
+      "sha256": "b1891e031e8dc04a00389755e695e8d80288105c1086d297e18b33ecaafc6d7c"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/LibraryTitleAndCacheTest.kt",
+      "bytes": 3559,
+      "sha256": "749626b0de4f3787d79a3b796b2956cae10f331ea98f52fb74abdea4f3668142"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/LibraryVisibilityTest.kt",
+      "bytes": 1680,
+      "sha256": "5a5291eac842bc15e465ff78e44ff24c47b49069ac9b1a48c432b428b914c331"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/LiteEditionTest.kt",
+      "bytes": 1109,
+      "sha256": "05b472b1b05ca3ab166aba59d07564cc22a49ac31902d1486cb615eeb19f2ff7"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/MetadataFileWritePolicyTest.kt",
+      "bytes": 1290,
+      "sha256": "d690c1e6e27f6e0ea2139ee5fa0c567b65d10c95132883e858b5fdf357845292"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/MetadataRankingTest.kt",
+      "bytes": 1356,
+      "sha256": "646532d60d1962a86448b7bf2a0045f63f476279bfa208eab6874d5170667b13"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/MetadataSearchPipelineTest.kt",
+      "bytes": 4253,
+      "sha256": "f3024ed2118adac0f5d2be3d90d2a7944771424a06204ead7fa448f3f33de6de"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/MetadataSourceBadgeTest.kt",
+      "bytes": 2108,
+      "sha256": "b904c81376a5eb5ffe97acc105a0e1bc119e6f443fd56d3d387a50be2f952160"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/PersistentLibraryCachePartitionTest.kt",
+      "bytes": 1062,
+      "sha256": "56ab4ec9a89417515e3e24402b2d69c453b7f93ec05b4895776b795d7cf7de77"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/PublicLibraryCatalogClientTest.kt",
+      "bytes": 6027,
+      "sha256": "b47088c0fa686c6ccb20bd555f2070b13abb7bd06edee0eaaabd7808b69f4a61"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/RangeSourcesTest.kt",
+      "bytes": 2856,
+      "sha256": "079134e7f70b1fb756390d408a6fa8c47b5baf9b12e8799ee18f93d8403dbc85"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/RcloneDriveOptionsTest.kt",
+      "bytes": 2188,
+      "sha256": "13c3e29291cc2e89c07e6121c90f8daab67aa7d705a0830082aca3e7fe93b4df"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/RcloneImportTest.kt",
+      "bytes": 1761,
+      "sha256": "5ac86a15c1b87986661f76366335e7a00134d39871a723396f5e1cea00b37748"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/RcloneModuleRemovalTest.kt",
+      "bytes": 627,
+      "sha256": "131f5a17200bee0f46252665995822dcbace5b51a816fe9fe7134ad95dfe08f2"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/ReaderBackgroundAndFontsTest.kt",
+      "bytes": 1831,
+      "sha256": "05bb4383d29d0c8eb25f6015b71cc25b57cfe054f2e8fc168f5a083bdc717a08"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/ReaderDesignTest.kt",
+      "bytes": 1620,
+      "sha256": "ddf853dad4f0605b986a3a22448715b4cc241b9dd16ed5bebaa44a231f4a8a01"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/ReaderFontsAndBackgroundsTest.kt",
+      "bytes": 2177,
+      "sha256": "f37f718fa54137b22af371267ada7587f3a93c38abb8dfc6e0b6fac03a2ae2da"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/RemoteArchiveReadPolicyTest.kt",
+      "bytes": 1321,
+      "sha256": "556ef766b818f31f55d73fb709b9eff92fd0efdc498de5cbb153a93538636bdd"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/RemoteBookFolderFilterTest.kt",
+      "bytes": 3956,
+      "sha256": "3ffa535d327222e81974951120c90da8ef6b629b02a0bdfa926e9669ade30d4d"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/SeriesVolumeTitleTest.kt",
+      "bytes": 3216,
+      "sha256": "eb4214625e7ed54d7ec18a0f79120cac47cbb3070b3932592a10a8d5bd308d8c"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/SftpStorageTest.kt",
+      "bytes": 980,
+      "sha256": "2f9c054b57be93afcfdb8bc4d7ba562019eea31792fe42256b8b3cefbdb616dc"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/StorageIconsTest.kt",
+      "bytes": 1114,
+      "sha256": "b83c8dd563f8506922801488139bd402fc8649c84769734d35f48d65d5ed787f"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/StorageWritePolicyTest.kt",
+      "bytes": 1137,
+      "sha256": "67192b2a0de60d2054fa3b7b06fc8d9c83ad49be14465518585324e996073f25"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/ThemeModeTest.kt",
+      "bytes": 667,
+      "sha256": "e23d46ba3d6d8576e1ce79c4b611f38134f80e4a3205631aaed7c9d38b56bf9d"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/WebDavListingTest.kt",
+      "bytes": 3935,
+      "sha256": "7de9be1b3ba69a4c84c818a68bf99abaf92cd97f2b9c98ed9a6137caf50a3925"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/WebNovelFallbackParserTest.kt",
+      "bytes": 2723,
+      "sha256": "c58f6d16132995e8dfc1054248092283bdf6577fd2e2c6d0d4d812af1d6fac31"
+    },
+    {
+      "path": "app/src/test/java/com/ckchoi/ckreader/YamlReadableDocumentTest.kt",
+      "bytes": 1536,
+      "sha256": "57087ce10a090f4e9d39dd7dd881cd3cbc2d263344c666aa7fd2a2aa6fd9e0c4"
+    },
+    {
+      "path": "build.gradle.kts",
+      "bytes": 191,
+      "sha256": "4192729568825cbff76bed6f2010af5a0e3b4bb1eefce989f0532cb0c0f1ff82"
+    },
+    {
+      "path": "gradle.properties",
+      "bytes": 168,
+      "sha256": "2b315ab8b4e8a26e7e72347f5d484272471d520dd8b367fba4f2b95b4a0c9ba8"
+    },
+    {
+      "path": "gradle/wrapper/gradle-wrapper.jar",
+      "bytes": 43504,
+      "sha256": "498495120a03b9a6ab5d155f5de3c8f0d986a449153702fb80fc80e134484f17"
+    },
+    {
+      "path": "gradle/wrapper/gradle-wrapper.properties",
+      "bytes": 250,
+      "sha256": "3d91f0932da99885c41e9dc4e85c9f9a2d3bfef4f0ad87473014dc0827a94884"
+    },
+    {
+      "path": "gradlew",
+      "bytes": 8762,
+      "sha256": "a3648413b47ef77af21d5ebc36c687c7d103aaef3e17f33de7d4f080a6f300a3"
+    },
+    {
+      "path": "gradlew.bat",
+      "bytes": 557,
+      "sha256": "14e15e35a84581d986266a3363ec8527233b397b57432ea904f174bb555c1abb"
+    },
+    {
+      "path": "providers/common/build.gradle.kts",
+      "bytes": 389,
+      "sha256": "2d4b3713ea16d957b5f5cd79babf854b3d2f40867127ccdcaeb925759336fd30"
+    },
+    {
+      "path": "providers/common/src/main/AndroidManifest.xml",
+      "bytes": 319,
+      "sha256": "823c398ebaad9f9d9d35208c36d670258b14cf8b2b5d13d5235e7f116ac6853d"
+    },
+    {
+      "path": "providers/common/src/main/java/com/ckchoi/elibrary/common/AppNavigationRegistry.kt",
+      "bytes": 620,
+      "sha256": "042dabfdb9c11a5762c3bcc734ede8d18005667dc1b00aa0c208b43babc8b0c8"
+    },
+    {
+      "path": "providers/common/src/main/java/com/ckchoi/elibrary/common/ArchiveRangeSource.kt",
+      "bytes": 1063,
+      "sha256": "8cd8a1dba36c6985b92b322cdf7bda75b75095231d2ad293b58e068511ec4476"
+    },
+    {
+      "path": "providers/common/src/main/java/com/ckchoi/elibrary/common/DownloadCenter.kt",
+      "bytes": 10244,
+      "sha256": "e390e597a436917cae645565a8d22f696c04220f975a80ecebf185df911647ea"
+    },
+    {
+      "path": "providers/common/src/main/java/com/ckchoi/elibrary/common/ExitGuard.kt",
+      "bytes": 1116,
+      "sha256": "7572dfed4ccc7a4d0dc0264ba4ef36da37ebe0952324a0380f9292739038debc"
+    },
+    {
+      "path": "providers/common/src/main/java/com/ckchoi/elibrary/common/GlobalConfig.kt",
+      "bytes": 6079,
+      "sha256": "8accb6152f53abc2209af59c9c5974d6d6f3268dfdfcbaa4aa26cba65577fa21"
+    },
+    {
+      "path": "providers/common/src/main/java/com/ckchoi/elibrary/common/InAppBrowserActivity.kt",
+      "bytes": 3489,
+      "sha256": "eb61fbe77c52defa657a70988d1db5f6ae53ba29e659905c09e8506b5cf70328"
+    },
+    {
+      "path": "providers/common/src/main/java/com/ckchoi/elibrary/common/ProviderChrome.kt",
+      "bytes": 5375,
+      "sha256": "c59414545027f556a2ff94970e8c6db0391aae7765bec4b79a2b94940351a661"
+    },
+    {
+      "path": "providers/common/src/main/java/com/ckchoi/elibrary/common/RangeReadChannel.kt",
+      "bytes": 2341,
+      "sha256": "891c4be539310f43a2d04dbae4c6ab97d382225ca7fc83ff7ca9fd69437c8d26"
+    },
+    {
+      "path": "providers/common/src/main/java/com/ckchoi/elibrary/common/ReaderBackgrounds.kt",
+      "bytes": 1160,
+      "sha256": "f43e7da76f95f3f29fe61b08eb1c5b4ffb35c0283ff7d375f3d8d4f2ae3d4e66"
+    },
+    {
+      "path": "providers/common/src/main/java/com/ckchoi/elibrary/common/ReaderDesign.kt",
+      "bytes": 7212,
+      "sha256": "7d04e6d954ee66380774e9269d2e7481b9cf2814808ffe99d8c4f463c2a79564"
+    },
+    {
+      "path": "providers/common/src/main/java/com/ckchoi/elibrary/common/ReaderDocumentSession.kt",
+      "bytes": 428,
+      "sha256": "a5cd718d9f8bd80295d49ee98a35ad2c33c01a8f2336a2f4fd5e16fdc55b4c88"
+    },
+    {
+      "path": "providers/common/src/main/java/com/ckchoi/elibrary/common/ReaderFontCatalog.kt",
+      "bytes": 4969,
+      "sha256": "c941008138dfb22f0fbc585a9b19e28185424c73e238ae44d3a2655b1dd94a4c"
+    },
+    {
+      "path": "providers/common/src/main/java/com/ckchoi/elibrary/common/ReaderFonts.kt",
+      "bytes": 9272,
+      "sha256": "30acedf95b78f6ec5074b281f31dbe27ef88d205db8edc6b6fd2efb8072ca10f"
+    },
+    {
+      "path": "providers/common/src/main/java/com/ckchoi/elibrary/common/SearchTheme.kt",
+      "bytes": 3536,
+      "sha256": "6da57d475d5dabcd39472d04990fb7f53395dde948c35cc592b3cb47d3b5abd4"
+    },
+    {
+      "path": "providers/common/src/main/res/anim/el_slide_in_left.xml",
+      "bytes": 253,
+      "sha256": "54c1701dcf74cbf334fa42137ea8c5b05524e1cc690bc8583517b30a2bd09b1f"
+    },
+    {
+      "path": "providers/common/src/main/res/anim/el_slide_in_right.xml",
+      "bytes": 252,
+      "sha256": "da95da56b4502c07d9e6de526660b69a240e7bf329fa6ddc6c0bafce5526d8e0"
+    },
+    {
+      "path": "providers/common/src/main/res/anim/el_slide_out_left.xml",
+      "bytes": 253,
+      "sha256": "fcb42d7dbebad1f6210f8756826a0f4ed1fca88bdeb850811e591a8352ab4f44"
+    },
+    {
+      "path": "providers/common/src/main/res/anim/el_slide_out_right.xml",
+      "bytes": 252,
+      "sha256": "5f056e4d33e182f668f63070376f25ddeeba4e4153661a24418ad39244fa6246"
+    },
+    {
+      "path": "providers/common/src/main/res/drawable/ck_reader_dialog_cobalt.xml",
+      "bytes": 399,
+      "sha256": "0e2fc1ca2f9ad533f90c4c11837de967257cde39de5a0d978f89cddaf3a5f1f3"
+    },
+    {
+      "path": "providers/common/src/main/res/drawable/ck_reader_dialog_heyclicky.xml",
+      "bytes": 393,
+      "sha256": "36840e619e87a41aac5df1308ac4380fc826892c976ab46f87f5d410ebb03ef6"
+    },
+    {
+      "path": "providers/common/src/main/res/values/reader_themes.xml",
+      "bytes": 4983,
+      "sha256": "f174b4ed8928fc4498888978a532c68b784918088df6dfde97a75e7e6179a39b"
+    },
+    {
+      "path": "providers/yes24/build.gradle.kts",
+      "bytes": 802,
+      "sha256": "2a022d2400c165576be68cd9704c35eb1d0c567ca001b26d524ccd9ee41b363a"
+    },
+    {
+      "path": "providers/yes24/src/main/AndroidManifest.xml",
+      "bytes": 1355,
+      "sha256": "932a12f315c332d9b48c52d91546909434489a6fedb83ad334ccafd26b9612e8"
+    },
+    {
+      "path": "providers/yes24/src/main/AndroidManifest.xml.before-original-apk",
+      "bytes": 853,
+      "sha256": "4080ae968cb67d8099538eced984af2262c646cfbc3c815c39cbd24c9b8dbeef"
+    },
+    {
+      "path": "providers/yes24/src/main/assets/voice/selvy-ii-license.json",
+      "bytes": 172,
+      "sha256": "3206d03a7bf4712fec13759dbd5a2f674828b176e4b226c912034dd4c8da6104"
+    },
+    {
+      "path": "providers/yes24/src/main/assets/voice/selvy-ii-license.zip",
+      "bytes": 4527,
+      "sha256": "cbc50b173c8590b3e420c9db7fad1b406078bcaef980263f469db99edd8263a4"
+    },
+    {
+      "path": "providers/yes24/src/main/assets/yes24/app.js",
+      "bytes": 28833,
+      "sha256": "276d2a621d038e4b39d7fe25ba29406b7fdc41c9a62fcd17e76c214cfe55f52c"
+    },
+    {
+      "path": "providers/yes24/src/main/assets/yes24/app.js.before-original-apk",
+      "bytes": 27393,
+      "sha256": "773091b9d16c8281aaf6700dc86ef693b39f6e1b8c21c23a9562ad898dfb0e72"
+    },
+    {
+      "path": "providers/yes24/src/main/assets/yes24/crema-brand.png",
+      "bytes": 3924,
+      "sha256": "d0ae019259dea41d485f99b7c82044d22a337ffe8eb0b4194b1231f69119a699"
+    },
+    {
+      "path": "providers/yes24/src/main/assets/yes24/crema-club.png",
+      "bytes": 14027,
+      "sha256": "4bcfa1c60624bc4873b7230e098b7a398b0cba515a9cf7857b1a5cd41545aeed"
+    },
+    {
+      "path": "providers/yes24/src/main/assets/yes24/download-center.js",
+      "bytes": 3423,
+      "sha256": "c9243516f8e664264b75dd9643733fe927a2f31ece97046a5c00f54081867b55"
+    },
+    {
+      "path": "providers/yes24/src/main/assets/yes24/electronic-library.png",
+      "bytes": 32621,
+      "sha256": "ca8845a64a2fbe151edd2a1fe772839d1b71db40aa0adb489350e1c9eea57d2d"
+    },
+    {
+      "path": "providers/yes24/src/main/assets/yes24/electronic.js",
+      "bytes": 10771,
+      "sha256": "231835cf182904861ac217010fdd27f2d2cb133401cd242d48f2df3b768443f9"
+    },
+    {
+      "path": "providers/yes24/src/main/assets/yes24/icon.png",
+      "bytes": 17375,
+      "sha256": "f41a9b33a585cd9a870233ac6beb942ea8a83d81a1cb53d68825f3dd1df229a2"
+    },
+    {
+      "path": "providers/yes24/src/main/assets/yes24/index.html",
+      "bytes": 14893,
+      "sha256": "34520dac7ee30f849c07bf9802b07dea94f71a303c45833fdc566dc1121bab7c"
+    },
+    {
+      "path": "providers/yes24/src/main/assets/yes24/index.html.before-original-apk",
+      "bytes": 11396,
+      "sha256": "6891b232846779a3358bad9477fea8e6f2a79a5a19dc729cdfaa9eb97955a71f"
+    },
+    {
+      "path": "providers/yes24/src/main/assets/yes24/readlife.js",
+      "bytes": 6890,
+      "sha256": "ed9863a813f1d412b536d9566ff538c29e00fbd8da745e4db66744d0a677f494"
+    },
+    {
+      "path": "providers/yes24/src/main/assets/yes24/settings-fold.js",
+      "bytes": 639,
+      "sha256": "980f3a3385b47ea2224adf1383ae3dbb4f441d287fc7c7aaea27414aff9b4286"
+    },
+    {
+      "path": "providers/yes24/src/main/assets/yes24/settings-transfer.js",
+      "bytes": 2398,
+      "sha256": "1d4e28b644e68e81a1fac5ac83a83241d0e6912981c9083194a44fe634b33e77"
+    },
+    {
+      "path": "providers/yes24/src/main/assets/yes24/style.css",
+      "bytes": 17996,
+      "sha256": "00a88e720f04ee49d617753b9c3b4d0f07847c90be3bf7f016eed2f0dddb1108"
+    },
+    {
+      "path": "providers/yes24/src/main/assets/yes24/style.css.before-original-apk",
+      "bytes": 14712,
+      "sha256": "040b451521118a24bee66165ade7b59f25e217805c9a0571f14ff1ac4b9721d6"
+    },
+    {
+      "path": "providers/yes24/src/main/assets/yes24/yes24-ebook.png",
+      "bytes": 9269,
+      "sha256": "dfeb5d4419498dbf5d61ba1c75057907cbca0469b111a4165f7e8d598e5429dd"
+    },
+    {
+      "path": "providers/yes24/src/main/assets/yes24/yes24.js",
+      "bytes": 6022,
+      "sha256": "589fe4899ac5ad24329985835af1670a7004f31b1dee913db1d57ce873a2a41b"
+    },
+    {
+      "path": "providers/yes24/src/main/java/com/ckchoi/yesss24/CremaAccounts.java",
+      "bytes": 2693,
+      "sha256": "1addae5cd94c09757ee4499913c979eb39b93dfeacad3ac75207be4cc1247d70"
+    },
+    {
+      "path": "providers/yes24/src/main/java/com/ckchoi/yesss24/DownloadPattern.java",
+      "bytes": 759,
+      "sha256": "d06621445acf3f0bad5ebf9b6a98ae256fcf9af6a0a27e3a5bc91e5166cd9602"
+    },
+    {
+      "path": "providers/yes24/src/main/java/com/ckchoi/yesss24/RestoreTransaction.java",
+      "bytes": 596,
+      "sha256": "9674b5e045bf4818974d32c011805ac69f03c51faf5813d5a1faca4db8ace3d1"
+    },
+    {
+      "path": "providers/yes24/src/main/java/com/ckchoi/yesss24/SecureStore.java",
+      "bytes": 1923,
+      "sha256": "a270907f59fa602b1de3845d82d237cdc28352cb8603b89ccec107e19ccee05a"
+    },
+    {
+      "path": "providers/yes24/src/main/java/com/ckchoi/yesss24/SessionCodec.java",
+      "bytes": 2843,
+      "sha256": "bed4512728bae1dcb1274990724e7dabe54859ec54dbd1680f7bebbfffce2a0e"
+    },
+    {
+      "path": "providers/yes24/src/main/java/com/ckchoi/yesss24/SettingsBackupCodec.java",
+      "bytes": 7412,
+      "sha256": "08dd8954002c82311b84d48cfa6095a55034e58bb9df22e2eff4450527481b50"
+    },
+    {
+      "path": "providers/yes24/src/main/java/com/ckchoi/yesss24/Yes24Client.java",
+      "bytes": 31277,
+      "sha256": "d344d4ede89af7a34e5a61a3cd86fa790e8e77ad22282b7513e81b726e863688"
+    },
+    {
+      "path": "providers/yes24/src/main/java/com/selvasai/selvy/deeptts/OnxVoiceStatusListener.java",
+      "bytes": 461,
+      "sha256": "2b7084fb0c47a54f76feb2e36fadb3a1ac5b5c452c7f58dd58ae96997bf3c7d1"
+    },
+    {
+      "path": "providers/yes24/src/main/java/com/selvasai/selvy/deeptts/PlayTTSListItem.java",
+      "bytes": 651,
+      "sha256": "9c1d5683f7921e22e26d012accc0852a09219bc3bbcce95b0ea479b308ebebd2"
+    },
+    {
+      "path": "providers/yes24/src/main/java/com/selvasai/selvy/deeptts/xVoice.java",
+      "bytes": 4932,
+      "sha256": "af1921b3a88e949a7c522d2e8433db0e476d36d6f2adca5a1bfbd5a9a3506e76"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/AiVoiceData.kt",
+      "bytes": 3817,
+      "sha256": "3b37d4654f687d89b13be522442d519b1cd63198b73463cb17e814d550dbdff9"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/AiVoiceDownloadActivity.kt",
+      "bytes": 1286,
+      "sha256": "cec10938380a21cf5f3c6ea99413a36b9f004ccb4f70c5d6ef7899bbd8294d62"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/AiVoiceEngine.kt",
+      "bytes": 3864,
+      "sha256": "35d9926b0dc2a5b12f807f8d1abec151ba3b2f25365313a8b67854874986d749"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/ComicCenterTapPolicy.kt",
+      "bytes": 422,
+      "sha256": "59d87f2c0c665ac94c87815b83e9dabf29932cce0904151b7ad1a858e3adab3a"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/ComicReadingPolicy.kt",
+      "bytes": 1645,
+      "sha256": "f8b81d8a64059cdf5f2a7ba5531dc46577f85eb21189ad5cad92b9f523851561"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/ComicVerticalReader.kt",
+      "bytes": 8554,
+      "sha256": "a52c5ef490079a6038329ab0ca94f4642435586e4cd4df160b95fb8c08b1b171"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/DownloadPublisher.kt",
+      "bytes": 4343,
+      "sha256": "f0d7ba8b276fe29bde7031c829cf781bd03f9b02e00785403333923bb19ab80e"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/EpubPaths.kt",
+      "bytes": 1108,
+      "sha256": "41de3bbfb70a37145238fec58c8cdd5aa37335c0a8cb9ce7fcdc0d8c6be95c08"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/EpubSpeechHighlight.kt",
+      "bytes": 1000,
+      "sha256": "fc0f0bfa31d48a33f6e815e3c9a97b622b13fe988c3cd89301fb01629c236899"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/EpubSpeechNavigation.kt",
+      "bytes": 394,
+      "sha256": "3d00798286cbb4ceebf1170b04e12c84d9b2e422e562d8c665917953f97ba10a"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/EpubSpeechSnapshot.kt",
+      "bytes": 8325,
+      "sha256": "dd4f4d5912e1869878e22675fe9f76b24ee45fcf99d86f8a403a922133a00a7a"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/JobService.kt",
+      "bytes": 5654,
+      "sha256": "34bc37b4f4ff87095aa3d24522c83b927f39dd31601c3f7b2224447ccf4166fa"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/MainActivity.kt",
+      "bytes": 28105,
+      "sha256": "998d1dabe54645288c1ff3e3521e60df139e2fc9fd10858ff868a151bfd144ed"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/MainActivity.kt.before-original-apk",
+      "bytes": 23158,
+      "sha256": "53c6b078f8b98c56b0320080b09b489778012b33e9bab2b7eebd27c69cc3adf4"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/PaperPageTurnView.kt",
+      "bytes": 5093,
+      "sha256": "3bcc249803adadf6b04b94c134b45aa8724ce6e6fc6ab63dd752571f740e38d7"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/PdfSpeechExtractor.kt",
+      "bytes": 8023,
+      "sha256": "ec58dd275a034ab76f0893bb643e1cdc33d133ee460734006d1005dac768381c"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/ReaderContentSupport.kt",
+      "bytes": 8771,
+      "sha256": "47d3a30d094b6ba6a0d6fe459af1c562a039ec2457f44537ff9b1e67cb680dd7"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/ReaderFontStyling.kt",
+      "bytes": 1238,
+      "sha256": "015e18129b5ae135c9be4b575d7e6bfc8ddd64f247ea0310d27ac3545dcaf8ec"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/ReaderTtsNotificationService.kt",
+      "bytes": 4970,
+      "sha256": "4dff20d7076fe2520788a95c16ba541e4bbaa0f3be703363ed069be781c8553d"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/RidiLicense.kt",
+      "bytes": 2733,
+      "sha256": "a7fa9e8a6f408f331ff590695040940deddc5e5ed83b09a26a3fbbb1f6b941ab"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/RidiLicenseUpdate.kt",
+      "bytes": 3945,
+      "sha256": "a9b1ed6674b05db473c810f854fa5066f712e2c7a527f11d5e80a90a0525a669"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/RidiVoiceData.kt",
+      "bytes": 2916,
+      "sha256": "620d821425830909c516faac3fe17089bc7f393529e468065bf61be4c8d51062"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/SelvyVoiceService.kt",
+      "bytes": 5174,
+      "sha256": "53ceaf3f373a314c162b72bf0b3c7678a037dfcaa43775ed8c510bf68f95b554"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/SentenceHoldGesture.kt",
+      "bytes": 1521,
+      "sha256": "9792f8ff377196b324ef0976080547a5c425b6b67c14635b4d1d3ccca35287f4"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/SettingsTransfer.kt",
+      "bytes": 6776,
+      "sha256": "0f084c5a2e8becd3a355ac2fd181721b6c093e8800930247fbc7a29d1642315b"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/SpeechPosition.kt",
+      "bytes": 732,
+      "sha256": "2a8ab8c2482c496d06004def9f5d106585f18c5af4e0d50901e613f1816a1975"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/SpeechText.kt",
+      "bytes": 2269,
+      "sha256": "6310fa53cda9071615663028621a81cd2e796c4276dd5bb2ab221056ca6b239f"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/StandaloneReaderActivity.kt",
+      "bytes": 109885,
+      "sha256": "1179f19d21cd6336d31467ce3801df1e6b3ba41b3528919ab668ccfd80d283c0"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/StandaloneReaderActivity.kt.before-pdf-txt-comic",
+      "bytes": 51417,
+      "sha256": "cc3c2f4d11c784bd3277fc23da0390aa48a2c06ea68b714cbeac57fba560f45c"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/Store.kt",
+      "bytes": 1806,
+      "sha256": "e14fbbefa9e92818b9f8cabb3d056e44ab10951f87cf1311cb33de1f01e0709c"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/VoiceModules.kt",
+      "bytes": 987,
+      "sha256": "8dabaf53b48ec5306b93270bf8bcca5f62d6845a08679af2d579718731c2f6d8"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/WillaVoices.kt",
+      "bytes": 175,
+      "sha256": "85fdda3e32db3bd940fd7df57cfe9d0ae72ba9124090639d5337ef2eca1c3be6"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/Yes24Drm.kt",
+      "bytes": 8014,
+      "sha256": "d716778a51909c1159f30c718a16cad94f487c8d4e9125b7193bd0d4706fa9fb"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/Yes24LibraryNative.kt",
+      "bytes": 14429,
+      "sha256": "ebf770462aeabc154cd435c53c0fe9ac8ead8162ba53d70638ae792552c84609"
+    },
+    {
+      "path": "providers/yes24/src/main/kotlin/com/ckchoi/yesss24/ZoomablePageView.kt",
+      "bytes": 8916,
+      "sha256": "d93aa4ff5e7e073f905def671f63d573c3d0a4baced7ed8e3329bdcdba194eff"
+    },
+    {
+      "path": "providers/yes24/src/main/res/drawable-nodpi/yesss24_icon.png",
+      "bytes": 17375,
+      "sha256": "f41a9b33a585cd9a870233ac6beb942ea8a83d81a1cb53d68825f3dd1df229a2"
+    },
+    {
+      "path": "providers/yes24/src/main/res/drawable/icon_foreground.xml",
+      "bytes": 241,
+      "sha256": "341b0f985a6e64ed8eea8c9216ef132c46af0af3a44b6f407c817790f208840e"
+    },
+    {
+      "path": "providers/yes24/src/main/res/mipmap-anydpi-v26/ic_launcher.xml",
+      "bytes": 203,
+      "sha256": "606465b27610ed72103bfd573a518ee2160de203d95195a51178c336a05a1041"
+    },
+    {
+      "path": "providers/yes24/src/main/res/mipmap-nodpi/ic_launcher.png",
+      "bytes": 17375,
+      "sha256": "f41a9b33a585cd9a870233ac6beb942ea8a83d81a1cb53d68825f3dd1df229a2"
+    },
+    {
+      "path": "providers/yes24/src/main/res/values/styles.xml",
+      "bytes": 354,
+      "sha256": "5385806473202725cdee577f4360acdf4427d214ce317749aeca79af8db69b53"
+    },
+    {
+      "path": "providers/yes24/src/main/res/xml/data_extraction_rules.xml",
+      "bytes": 469,
+      "sha256": "334397043590a14ba97b97796b1076a4a2cba8a46c3db8a597e27315e18f3aaa"
+    },
+    {
+      "path": "providers/yes24/src/main/res/xml/file_paths.xml",
+      "bytes": 66,
+      "sha256": "3e16a5359a5bcd2dc94573030b3523f8ebbe1ca85c588a8352b17d367274934d"
+    },
+    {
+      "path": "providers/yes24/src/test/kotlin/com/ckchoi/yesss24/ComicCenterTapPolicyTest.kt",
+      "bytes": 884,
+      "sha256": "8516e8b7b7c1ccfa6f438c98c2dce7b0c702322784f2eb91ad3abb0030a0f3d2"
+    },
+    {
+      "path": "providers/yes24/src/test/kotlin/com/ckchoi/yesss24/ComicReadingPolicyTest.kt",
+      "bytes": 2005,
+      "sha256": "12b64a16a7d1763dd0bd7c9c59a0b4f424a677e098c8f687d4c139cd2af3fa3a"
+    },
+    {
+      "path": "providers/yes24/src/test/kotlin/com/ckchoi/yesss24/EpubPathsTest.kt",
+      "bytes": 1831,
+      "sha256": "260c4678fef48a01379b5afe382c7bbcb9bbb04dc32f69fe2bb024c67376812a"
+    },
+    {
+      "path": "providers/yes24/src/test/kotlin/com/ckchoi/yesss24/EpubSpeechNavigationTest.kt",
+      "bytes": 783,
+      "sha256": "6806ecf4f39c2897c469db606556d6e9e8fcfeb56dcddb41439389d93b4d46b4"
+    },
+    {
+      "path": "providers/yes24/src/test/kotlin/com/ckchoi/yesss24/ReaderContentSupportTest.kt",
+      "bytes": 7678,
+      "sha256": "d538a34dcec5e583f70e40e49709fa95bcfafd2c55af6b3a9d6889733bd743ab"
+    },
+    {
+      "path": "providers/yes24/src/test/kotlin/com/ckchoi/yesss24/ReaderFontStylingTest.kt",
+      "bytes": 1331,
+      "sha256": "f25b377499905546fc3a7ba43e7d5214c2e147461015be3babf468e9e5cfb3ef"
+    },
+    {
+      "path": "providers/yes24/src/test/kotlin/com/ckchoi/yesss24/RidiLicenseTest.kt",
+      "bytes": 3237,
+      "sha256": "ced52a36e28b134a9a9286c9d430a3edae543ce1565f2468fa4a4e615873d385"
+    },
+    {
+      "path": "providers/yes24/src/test/kotlin/com/ckchoi/yesss24/SpeechPositionTest.kt",
+      "bytes": 1077,
+      "sha256": "b7ade66824ef5a253e895529b912a6136d596a9bbdd7295c9bab85f365d99188"
+    },
+    {
+      "path": "providers/yes24/src/test/kotlin/com/ckchoi/yesss24/SpeechTextTest.kt",
+      "bytes": 1842,
+      "sha256": "8e1aa1d5aa821e8fb50708183aa716e837b0a893f7fed8f8d08327178e10c939"
+    },
+    {
+      "path": "settings.gradle.kts",
+      "bytes": 309,
+      "sha256": "653cd15694368c4b1773d716724953c226e46595df7da88e8724d561f6119c1b"
+    },
+    {
+      "path": "signing/release.properties.example",
+      "bytes": 261,
+      "sha256": "4ed2a5e51a0176e4803fd7ca637592725f2ae9e0c6250452411f3635a852d54a"
+    }
+  ]
+}

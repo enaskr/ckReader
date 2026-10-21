@@ -1,0 +1,6 @@
+# Copy to release.properties only on the build host. Never commit real secrets.
+# storeFile is relative to the ckReader project root.
+storeFile=signing/release.jks
+storePassword=REPLACE_STORE_PASSWORD
+keyAlias=REPLACE_KEY_ALIAS
+keyPassword=REPLACE_KEY_PASSWORD

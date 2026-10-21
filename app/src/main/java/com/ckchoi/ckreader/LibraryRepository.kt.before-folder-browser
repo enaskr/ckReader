@@ -1,0 +1,361 @@
+package com.ckchoi.ckreader
+
+import android.content.Context
+import android.net.Uri
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
+import androidx.documentfile.provider.DocumentFile
+import org.apache.commons.net.ftp.FTP
+import org.apache.commons.net.ftp.FTPClient
+import org.json.JSONArray
+import org.json.JSONObject
+import org.yaml.snakeyaml.Yaml
+import org.yaml.snakeyaml.LoaderOptions
+import org.yaml.snakeyaml.constructor.SafeConstructor
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import okhttp3.RequestBody.Companion.toRequestBody
+import java.io.File
+import java.io.InputStream
+import java.net.HttpURLConnection
+import java.net.URL
+import java.net.URLEncoder
+import java.security.KeyStore
+import java.security.MessageDigest
+import java.util.Base64
+import java.util.UUID
+import java.util.concurrent.TimeUnit
+import javax.crypto.Cipher
+import javax.crypto.KeyGenerator
+import javax.crypto.SecretKey
+import javax.crypto.spec.GCMParameterSpec
+import javax.xml.XMLConstants
+import javax.xml.parsers.DocumentBuilderFactory
+
+data class LibrarySource(val id:String, val type:String, val name:String, val location:String,
+                         val user:String="", val secret:String="", val extra:String="") {
+ fun json()=JSONObject().put("id",id).put("type",type).put("name",name).put("location",location)
+  .put("user",user).put("secret",secret).put("extra",extra)
+ companion object { fun from(o:JSONObject)=LibrarySource(o.getString("id"),o.getString("type"),o.getString("name"),
+  o.getString("location"),o.optString("user"),o.optString("secret"),o.optString("extra")) }
+}
+
+data class LibraryBook(val id:String, val source:LibrarySource, val path:String, val filename:String,
+                       val uri:Uri?=null, var title:String="", var author:String="", var publisher:String="",
+                       var bookId:String="", var cover:String="") {
+ val format:String get()=filename.substringAfterLast('.').lowercase()
+ val shownTitle:String get()=title.ifBlank { filename }
+}
+
+class LibraryRepository(private val context:Context) {
+ private val http=OkHttpClient.Builder().connectTimeout(20,TimeUnit.SECONDS).readTimeout(30,TimeUnit.SECONDS).build()
+ private val prefs=context.getSharedPreferences("ckreader_library",Context.MODE_PRIVATE)
+ private val alias="ckreader_sources"
+ private fun key():SecretKey {
+  val store=KeyStore.getInstance("AndroidKeyStore").apply { load(null) }
+  (store.getKey(alias,null) as? SecretKey)?.let { return it }
+  return KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES,"AndroidKeyStore").apply {
+   init(KeyGenParameterSpec.Builder(alias,KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT)
+    .setBlockModes(KeyProperties.BLOCK_MODE_GCM).setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE).build())
+  }.generateKey()
+ }
+ private fun encrypt(value:String):String {
+  val cipher=Cipher.getInstance("AES/GCM/NoPadding").apply { init(Cipher.ENCRYPT_MODE,key()) }
+  return Base64.getEncoder().encodeToString(cipher.iv+cipher.doFinal(value.toByteArray(Charsets.UTF_8)))
+ }
+ private fun decrypt(value:String):String {
+  val bytes=Base64.getDecoder().decode(value)
+  val cipher=Cipher.getInstance("AES/GCM/NoPadding").apply { init(Cipher.DECRYPT_MODE,key(),GCMParameterSpec(128,bytes.copyOfRange(0,12))) }
+  return String(cipher.doFinal(bytes.copyOfRange(12,bytes.size)),Charsets.UTF_8)
+ }
+ fun sources():List<LibrarySource> = try {
+  val raw=prefs.getString("sources",null) ?: return emptyList()
+  val array=JSONArray(decrypt(raw));(0 until array.length()).map { LibrarySource.from(array.getJSONObject(it)) }
+ } catch(_:Exception) { emptyList() }
+ fun save(sources:List<LibrarySource>) {
+  val array=JSONArray();sources.forEach { array.put(it.json()) }
+  prefs.edit().putString("sources",encrypt(array.toString())).apply()
+ }
+ fun add(type:String,name:String,location:String,user:String="",secret:String="",extra:String="") {
+  save(sources()+LibrarySource(UUID.randomUUID().toString(),type,name,location,user,secret,extra))
+ }
+ fun removeSource(id:String) { save(sources().filterNot { it.id==id }) }
+ fun hidden(id:String)=prefs.getBoolean("hidden_"+sha(id),false)
+ fun hide(id:String) { prefs.edit().putBoolean("hidden_"+sha(id),true).apply() }
+ fun lastRead(id:String)=prefs.getLong("last_"+id,0L)
+ private fun sha(s:String)=MessageDigest.getInstance("SHA-256").digest(s.toByteArray()).joinToString(""){"%02x".format(it)}
+ private fun book(source:LibrarySource,path:String,uri:Uri?=null):LibraryBook {
+  val file=path.substringAfterLast('/');return LibraryBook(sha(source.id+":"+path).take(24),source,path,file,uri)
+ }
+ fun scan():Pair<List<LibraryBook>,List<String>> {
+  val books=mutableListOf<LibraryBook>();val errors=mutableListOf<String>()
+  for(source in sources()) try {
+   when(source.type) {
+    "local"->scanLocal(source,books)
+    "webdav"->scanDav(source,books)
+    "ftp"->scanFtp(source,books)
+    "drive"->scanDrive(source,books)
+   }
+  } catch(e:Exception) { errors.add("${source.name}: ${e.message ?: "연결 실패"}") }
+  return books.filterNot { hidden(it.id) }.sortedWith(compareBy<LibraryBook> { it.shownTitle.lowercase() }.thenBy { it.filename }) to errors
+ }
+ private fun isBook(name:String)=name.endsWith(".epub",true)||name.endsWith(".pdf",true)
+ private fun yamlName(names:Collection<String>,bookName:String):String? {
+  val stem=bookName.substringBeforeLast('.')
+  for(extension in listOf("yaml","yml"))names.firstOrNull { it.equals("$stem.$extension",true) }?.let { return it }
+  val yaml=names.filter { it.endsWith(".yaml",true)||it.endsWith(".yml",true) }
+  return yaml.singleOrNull()
+ }
+ private fun applyYaml(book:LibraryBook,stream:InputStream?) {
+  if(stream==null)return
+  val map=stream.use { Yaml(SafeConstructor(LoaderOptions())).load<Any>(it) } as? Map<*,*> ?: return
+  fun get(vararg names:String)=names.firstNotNullOfOrNull { name -> map.entries.firstOrNull { it.key.toString().equals(name,true) }?.value?.toString() }.orEmpty()
+  book.title=get("title","제목","도서명")
+  book.author=get("author","authors","저자")
+  book.publisher=get("publisher","출판사")
+  book.bookId=get("book_id","bookId","id","isbn","도서ID","도서번호")
+  book.cover=get("cover","cover_image","image","표지")
+ }
+ private fun scanLocal(source:LibrarySource,out:MutableList<LibraryBook>) {
+  val root=DocumentFile.fromTreeUri(context,Uri.parse(source.location)) ?: error("폴더 접근 불가")
+  fun walk(folder:DocumentFile,relative:String,depth:Int) {
+   if(depth>12)return
+   val children=folder.listFiles();val names=children.associateBy { it.name.orEmpty().lowercase() }
+   for(item in children) {
+    val name=item.name ?: continue;val path=if(relative.isEmpty())name else "$relative/$name"
+    if(item.isDirectory)walk(item,path,depth+1)
+    else if(isBook(name)) {
+     val b=book(source,path,item.uri)
+     yamlName(names.keys,name)?.let { candidate -> names[candidate.lowercase()]?.let { yaml -> runCatching { applyYaml(b,context.contentResolver.openInputStream(yaml.uri)) } } }
+     out.add(b)
+    }
+   }
+  }
+  walk(root,"",0)
+ }
+ private fun connection(url:String,method:String="GET",user:String="",pass:String=""):HttpURLConnection {
+  val c=URL(url).openConnection() as HttpURLConnection
+  c.requestMethod=method;c.connectTimeout=20000;c.readTimeout=30000
+  if(user.isNotEmpty())c.setRequestProperty("Authorization","Basic "+Base64.getEncoder().encodeToString("$user:$pass".toByteArray()))
+  return c
+ }
+ private fun davUrl(base:String,path:String):String=base.trimEnd('/')+"/"+path.split('/').filter { it.isNotEmpty() }.joinToString("/") { URLEncoder.encode(it,"UTF-8").replace("+","%20") }
+ private fun davEntries(source:LibrarySource,path:String):List<Pair<String,Boolean>> {
+  val req=Request.Builder().url(davUrl(source.location,path)).method("PROPFIND","<d:propfind xmlns:d='DAV:'><d:allprop/></d:propfind>".toRequestBody("application/xml".toMediaType()))
+   .header("Depth","1")
+  if(source.user.isNotEmpty())req.header("Authorization","Basic "+Base64.getEncoder().encodeToString("${source.user}:${source.secret}".toByteArray()))
+  val f=DocumentBuilderFactory.newInstance().apply {
+   isNamespaceAware=true;setFeature("http://apache.org/xml/features/disallow-doctype-decl",true)
+   setFeature("http://xml.org/sax/features/external-general-entities",false)
+   setFeature("http://xml.org/sax/features/external-parameter-entities",false)
+   setFeature(XMLConstants.FEATURE_SECURE_PROCESSING,true)
+  }
+  val doc=http.newCall(req.build()).execute().use { response ->
+   if(!response.isSuccessful)error("WebDAV HTTP ${response.code}")
+   f.newDocumentBuilder().parse(response.body?.byteStream() ?: error("WebDAV 응답 없음"))
+  }
+  val responses=doc.getElementsByTagNameNS("DAV:","response")
+  val result=mutableListOf<Pair<String,Boolean>>()
+  for(i in 0 until responses.length) {
+   val node=responses.item(i)
+   val href=(node as org.w3c.dom.Element).getElementsByTagNameNS("DAV:","href").item(0)?.textContent ?: continue
+   val hrefPath=Uri.parse(href).path.orEmpty().trimEnd('/')
+   val name=Uri.decode(hrefPath.substringAfterLast('/'))
+   if(name.isBlank() || hrefPath==URL(davUrl(source.location,path)).path.trimEnd('/'))continue
+   val folder=node.getElementsByTagNameNS("DAV:","collection").length>0
+   result.add(name to folder)
+  }
+  return result
+ }
+ private fun scanDav(source:LibrarySource,out:MutableList<LibraryBook>) {
+  fun walk(path:String,depth:Int) {
+   if(depth>12)return
+   val entries=davEntries(source,path);val names=entries.map { it.first.lowercase() }.toSet()
+   for((name,folder) in entries) {
+    val child=if(path.isEmpty())name else "$path/$name"
+    if(folder)walk(child,depth+1) else if(isBook(name)) {
+     val b=book(source,child)
+     yamlName(entries.map { it.first },name)?.let { yaml -> runCatching { applyYaml(b,openDav(source,if(path.isEmpty())yaml else "$path/$yaml")) } }
+     out.add(b)
+    }
+   }
+  }
+  walk("",0)
+ }
+ private fun openDav(source:LibrarySource,path:String):InputStream {
+  val c=connection(davUrl(source.location,path),user=source.user,pass=source.secret)
+  if(c.responseCode !in 200..299)error("WebDAV HTTP ${c.responseCode}")
+  return c.inputStream
+ }
+ private fun ftpClient(source:LibrarySource):FTPClient {
+  val url=URL(source.location)
+  val client=FTPClient();client.connect(url.host,if(url.port>0)url.port else 21)
+  if(!client.login(source.user,source.secret))error("FTP 로그인 실패")
+  client.enterLocalPassiveMode();client.setFileType(FTP.BINARY_FILE_TYPE)
+  return client
+ }
+ private fun scanFtp(source:LibrarySource,out:MutableList<LibraryBook>) {
+  val ftp=ftpClient(source)
+  try {
+   val root=URL(source.location).path.trimEnd('/').ifBlank { "/" }
+   fun walk(path:String,relative:String,depth:Int) {
+    if(depth>12)return
+    val entries=ftp.listFiles(path);val names=entries.map { it.name.lowercase() }.toSet()
+    for(item in entries) {
+     val name=item.name;if(name=="."||name=="..")continue
+     val child=path.trimEnd('/')+"/"+name;val rel=if(relative.isEmpty())name else "$relative/$name"
+     if(item.isDirectory)walk(child,rel,depth+1) else if(isBook(name)) {
+      val b=book(source,rel)
+      yamlName(entries.map { it.name },name)?.let { yaml -> runCatching {
+       val stream=ftp.retrieveFileStream(path.trimEnd('/')+"/"+yaml)
+       if(stream!=null)try { applyYaml(b,stream) } finally { ftp.completePendingCommand() }
+      } }
+      out.add(b)
+     }
+    }
+   }
+   walk(root,"",0)
+  } finally { runCatching { ftp.logout();ftp.disconnect() } }
+ }
+ private fun driveToken(source:LibrarySource):String {
+  val config=JSONObject(source.extra);val token=JSONObject(config.getString("token"))
+  val expires=runCatching { java.time.Instant.parse(token.optString("expiry")).toEpochMilli() }.getOrDefault(0L)
+  if(expires>System.currentTimeMillis()+60000)return token.getString("access_token")
+  val clientId=config.optString("client_id");val clientSecret=config.optString("client_secret")
+  if(clientId.isBlank()||clientSecret.isBlank())error("rclone 설정에 client_id와 client_secret이 필요합니다")
+  val c=connection("https://oauth2.googleapis.com/token","POST")
+  c.doOutput=true;c.setRequestProperty("Content-Type","application/x-www-form-urlencoded")
+  val fields=mapOf("client_id" to clientId,"client_secret" to clientSecret,"refresh_token" to token.getString("refresh_token"),"grant_type" to "refresh_token")
+  c.outputStream.use { it.write(fields.entries.joinToString("&") { (k,v)->"$k=${URLEncoder.encode(v,"UTF-8")}" }.toByteArray()) }
+  if(c.responseCode !in 200..299)error("Google 인증 HTTP ${c.responseCode}")
+  val data=JSONObject(c.inputStream.bufferedReader().use { it.readText() });c.disconnect()
+  token.put("access_token",data.getString("access_token"));token.put("expiry",java.time.Instant.ofEpochMilli(System.currentTimeMillis()+data.optLong("expires_in",3600)*1000).toString())
+  config.put("token",token.toString());save(sources().map { if(it.id==source.id)it.copy(extra=config.toString()) else it })
+  return token.getString("access_token")
+ }
+ private fun driveRequest(source:LibrarySource,url:String):HttpURLConnection {
+  val c=connection(url);c.setRequestProperty("Authorization","Bearer "+driveToken(source))
+  if(c.responseCode !in 200..299)error("Google Drive HTTP ${c.responseCode}")
+  return c
+ }
+ private fun driveChildren(source:LibrarySource,parent:String):List<JSONObject> {
+  val out=mutableListOf<JSONObject>();var next=""
+  do {
+   val query="'$parent' in parents and trashed = false"
+   val url="https://www.googleapis.com/drive/v3/files?q=${URLEncoder.encode(query,"UTF-8")}&fields=nextPageToken,files(id,name,mimeType)&pageSize=1000"+
+    if(next.isBlank())"" else "&pageToken=${URLEncoder.encode(next,"UTF-8")}" 
+   val c=driveRequest(source,url);val data=JSONObject(c.inputStream.bufferedReader().use { it.readText() });c.disconnect()
+   val files=data.getJSONArray("files");for(i in 0 until files.length())out.add(files.getJSONObject(i))
+   next=data.optString("nextPageToken")
+  } while(next.isNotBlank())
+  return out
+ }
+ private fun scanDrive(source:LibrarySource,out:MutableList<LibraryBook>) {
+  var root=JSONObject(source.extra).optString("root_folder_id","root")
+  for(segment in source.location.trim('/').split('/').filter { it.isNotBlank() })
+   root=driveChildren(source,root).firstOrNull { it.optString("name")==segment && it.optString("mimeType")=="application/vnd.google-apps.folder" }?.getString("id") ?: error("Drive 폴더 없음: $segment")
+  fun walk(parent:String,path:String,depth:Int) {
+   if(depth>12)return
+   val children=driveChildren(source,parent);val byName=children.associateBy { it.optString("name").lowercase() }
+   for(item in children) {
+    val name=item.getString("name");val rel=if(path.isEmpty())name else "$path/$name"
+    if(item.optString("mimeType")=="application/vnd.google-apps.folder")walk(item.getString("id"),rel,depth+1)
+    else if(isBook(name)) {
+     val b=book(source,rel);val yaml=yamlName(byName.keys,name)?.let { byName[it.lowercase()] }
+     if(yaml!=null)runCatching { applyYaml(b,openDrive(source,yaml.getString("id"))) }
+     val coverName=b.cover.substringAfterLast('/')
+     val coverId=byName[coverName.lowercase()]?.getString("id").orEmpty()
+     b.cover=item.getString("id")+"|"+coverId
+     out.add(b)
+    }
+   }
+  }
+  walk(root,"",0)
+ }
+ private fun openDrive(source:LibrarySource,id:String)=driveRequest(source,"https://www.googleapis.com/drive/v3/files/${URLEncoder.encode(id,"UTF-8")}?alt=media").inputStream
+ private fun limited(input:InputStream):ByteArray=input.use { stream ->
+  val bytes=stream.readNBytes(5_000_001);if(bytes.size>5_000_000)error("표지 파일이 너무 큽니다");bytes
+ }
+ fun cover(book:LibraryBook):ByteArray? {
+  val cover=book.cover.substringAfter('|',book.cover).substringAfterLast('/')
+  if(cover.isBlank() || cover=="." || cover=="..")return null
+  val parent=book.path.substringBeforeLast('/',"")
+  return when(book.source.type) {
+   "local"->{
+    var folder=DocumentFile.fromTreeUri(context,Uri.parse(book.source.location)) ?: return null
+    for(part in parent.split('/').filter { it.isNotBlank() })folder=folder.findFile(part) ?: return null
+    val file=folder.findFile(cover) ?: return null
+    context.contentResolver.openInputStream(file.uri)?.let(::limited)
+   }
+   "webdav"->limited(openDav(book.source,if(parent.isEmpty())cover else "$parent/$cover"))
+   "ftp"->{
+    val ftp=ftpClient(book.source)
+    try { val path=URL(book.source.location).path.trimEnd('/')+"/"+parent.let { if(it.isBlank())"" else "$it/" }+cover
+     val bytes=java.io.ByteArrayOutputStream();if(!ftp.retrieveFile(path,bytes))return null
+     if(bytes.size()>5_000_000)return null;bytes.toByteArray()
+    } finally { runCatching { ftp.logout();ftp.disconnect() } }
+   }
+   "drive"->book.cover.substringAfter('|').takeIf { it.isNotBlank() }?.let { limited(openDrive(book.source,it)) }
+   else->null
+  }
+ }
+ fun delete(book:LibraryBook) {
+  when(book.source.type) {
+   "local"->if(!android.provider.DocumentsContract.deleteDocument(context.contentResolver,book.uri ?: error("도서 경로 없음")))error("로컬 파일 삭제 실패")
+   "webdav"->{
+    val c=connection(davUrl(book.source.location,book.path),"DELETE",book.source.user,book.source.secret)
+    if(c.responseCode !in 200..299)error("WebDAV 삭제 HTTP ${c.responseCode}");c.disconnect()
+   }
+   "ftp"->{val ftp=ftpClient(book.source);try {
+    if(!ftp.deleteFile(URL(book.source.location).path.trimEnd('/')+"/"+book.path))error("FTP 삭제 실패")
+   } finally { runCatching { ftp.logout();ftp.disconnect() } }}
+   "drive"->{
+    val id=book.cover.substringBefore('|');val c=connection("https://www.googleapis.com/drive/v3/files/$id","DELETE")
+    c.setRequestProperty("Authorization","Bearer "+driveToken(book.source))
+    if(c.responseCode !in 200..299)error("Drive 삭제 HTTP ${c.responseCode}");c.disconnect()
+   }
+   else->error("지원하지 않는 저장소")
+  }
+  File(File(context.cacheDir,"library-books"),book.id+"."+book.format).delete()
+ }
+ fun open(book:LibraryBook):Uri {
+  book.uri?.let { return it }
+  val cache=File(context.cacheDir,"library-books").apply { mkdirs() }
+  val target=File(cache,book.id+"."+book.format)
+  if(target.exists()&&target.length()>0)return Uri.fromFile(target)
+  val temp=File(cache,book.id+".part")
+  try {
+   when(book.source.type) {
+    "webdav"->openDav(book.source,book.path).use { input -> temp.outputStream().use { input.copyTo(it) } }
+    "ftp"->{
+     val ftp=ftpClient(book.source)
+     try { val path=URL(book.source.location).path.trimEnd('/')+"/"+book.path
+      temp.outputStream().use { if(!ftp.retrieveFile(path,it))error("FTP 다운로드 실패") }
+     } finally { runCatching { ftp.logout();ftp.disconnect() } }
+    }
+    "drive"->{
+     val id=book.cover.substringBefore('|');openDrive(book.source,id).use { input -> temp.outputStream().use { input.copyTo(it) } }
+    }
+    else->error("지원하지 않는 저장소")
+   }
+   if(temp.length()==0L)error("빈 파일")
+   if(!temp.renameTo(target))error("파일 저장 실패")
+   return Uri.fromFile(target)
+  } finally { temp.delete() }
+ }
+ companion object {
+  fun rcloneRemotes(text:String):Map<String,JSONObject> {
+   val sections=linkedMapOf<String,MutableMap<String,String>>();var current:MutableMap<String,String>?=null
+   text.lineSequence().forEach { raw ->
+    val line=raw.trim()
+    if(line.startsWith("[")&&line.endsWith("]"))current=sections.getOrPut(line.substring(1,line.length-1)){linkedMapOf()}
+    else if(!line.startsWith("#")&&!line.startsWith(";")&&'=' in line)current?.put(line.substringBefore('=').trim(),line.substringAfter('=').trim())
+   }
+   return sections.filterValues { it["type"]=="drive" }.mapValues { (_,data)->
+    JSONObject().put("token",data["token"] ?: "{}").put("client_id",data["client_id"] ?: "")
+     .put("client_secret",data["client_secret"] ?: "").put("root_folder_id",data["root_folder_id"] ?: "root")
+   }
+  }
+ }
+}

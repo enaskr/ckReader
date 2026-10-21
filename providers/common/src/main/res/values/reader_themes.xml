@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Manual light/dark selection is controlled by GlobalConfig, not system night mode. -->
+    <color name="ck_hey_background">#F7F9FF</color>
+    <color name="ck_hey_surface">#FFFFFF</color>
+    <color name="ck_hey_text">#15213A</color>
+    <color name="ck_hey_muted">#52647E</color>
+    <color name="ck_hey_primary">#245CFF</color>
+    <color name="ck_hey_border">#BACFEB</color>
+    <color name="ck_cobalt_background">#081729</color>
+    <color name="ck_cobalt_surface">#102540</color>
+    <color name="ck_cobalt_text">#F3F7FF</color>
+    <color name="ck_cobalt_muted">#B7CBE6</color>
+    <color name="ck_cobalt_primary">#70ADFF</color>
+    <color name="ck_cobalt_border">#345171</color>
+
+    <style name="Theme.CkReader.Heyclicky" parent="android:style/Theme.Material.Light.NoActionBar">
+        <item name="android:colorAccent">@color/ck_hey_primary</item>
+        <item name="android:colorControlActivated">@color/ck_hey_primary</item>
+        <item name="android:colorControlNormal">@color/ck_hey_muted</item>
+        <item name="android:textColorPrimary">@color/ck_hey_text</item>
+        <item name="android:textColorSecondary">@color/ck_hey_muted</item>
+        <item name="android:windowBackground">@color/ck_hey_background</item>
+        <item name="android:statusBarColor">@color/ck_hey_background</item>
+        <item name="android:navigationBarColor">@color/ck_hey_background</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:fontFamily">sans</item>
+        <item name="android:alertDialogTheme">@style/Theme.CkReader.Heyclicky.Dialog</item>
+        <item name="android:buttonStyle">@style/Widget.CkReader.Button</item>
+        <item name="android:buttonBarButtonStyle">@style/Widget.CkReader.Button.Borderless</item>
+    </style>
+
+    <style name="Theme.CkReader.Cobalt" parent="android:style/Theme.Material.NoActionBar">
+        <item name="android:colorAccent">@color/ck_cobalt_primary</item>
+        <item name="android:colorControlActivated">@color/ck_cobalt_primary</item>
+        <item name="android:colorControlNormal">@color/ck_cobalt_muted</item>
+        <item name="android:textColorPrimary">@color/ck_cobalt_text</item>
+        <item name="android:textColorSecondary">@color/ck_cobalt_muted</item>
+        <item name="android:windowBackground">@color/ck_cobalt_background</item>
+        <item name="android:statusBarColor">@color/ck_cobalt_background</item>
+        <item name="android:navigationBarColor">@color/ck_cobalt_background</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
+        <item name="android:fontFamily">sans</item>
+        <item name="android:alertDialogTheme">@style/Theme.CkReader.Cobalt.Dialog</item>
+        <item name="android:buttonStyle">@style/Widget.CkReader.Button</item>
+        <item name="android:buttonBarButtonStyle">@style/Widget.CkReader.Button.Borderless</item>
+    </style>
+
+    <style name="Theme.CkReader.Heyclicky.Dialog" parent="android:style/Theme.Material.Light.Dialog.Alert">
+        <item name="android:windowBackground">@drawable/ck_reader_dialog_heyclicky</item>
+        <item name="android:colorAccent">@color/ck_hey_primary</item>
+        <item name="android:textColorPrimary">@color/ck_hey_text</item>
+        <item name="android:textColorSecondary">@color/ck_hey_muted</item>
+        <item name="android:buttonStyle">@style/Widget.CkReader.Button</item>
+        <item name="android:buttonBarButtonStyle">@style/Widget.CkReader.Button.Borderless</item>
+    </style>
+
+    <style name="Theme.CkReader.Cobalt.Dialog" parent="android:style/Theme.Material.Dialog.Alert">
+        <item name="android:windowBackground">@drawable/ck_reader_dialog_cobalt</item>
+        <item name="android:colorAccent">@color/ck_cobalt_primary</item>
+        <item name="android:textColorPrimary">@color/ck_cobalt_text</item>
+        <item name="android:textColorSecondary">@color/ck_cobalt_muted</item>
+        <item name="android:buttonStyle">@style/Widget.CkReader.Button</item>
+        <item name="android:buttonBarButtonStyle">@style/Widget.CkReader.Button.Borderless</item>
+    </style>
+    <style name="Widget.CkReader.Button" parent="android:style/Widget.Material.Button">
+        <item name="android:stateListAnimator">@null</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:translationZ">0dp</item>
+    </style>
+    <style name="Widget.CkReader.Button.Borderless" parent="android:style/Widget.Material.Button.Borderless">
+        <item name="android:stateListAnimator">@null</item>
+        <item name="android:elevation">0dp</item>
+        <item name="android:translationZ">0dp</item>
+        <item name="android:layout_marginTop">4dp</item>
+        <item name="android:layout_marginBottom">4dp</item>
+    </style>
+</resources>

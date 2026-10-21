@@ -1,0 +1,1016 @@
+package com.ckchoi.yesss24
+
+import android.app.Activity
+import android.app.AlertDialog
+import android.content.Intent
+import android.content.pm.ActivityInfo
+import android.content.res.Configuration
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.Color
+import android.graphics.Paint
+import android.graphics.Rect
+import android.graphics.pdf.PdfRenderer
+import android.net.Uri
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.ParcelFileDescriptor
+import android.speech.tts.TextToSpeech
+import android.speech.tts.UtteranceProgressListener
+import android.text.Html
+import android.util.Xml
+import android.view.Gravity
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
+import android.webkit.WebSettings
+import android.webkit.WebView
+import android.webkit.WebViewClient
+import android.widget.Button
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.ScrollView
+import android.widget.SeekBar
+import android.widget.Switch
+import android.widget.TextView
+import android.widget.Toast
+import org.xmlpull.v1.XmlPullParser
+import java.io.File
+import java.io.InputStream
+import java.security.MessageDigest
+import java.util.concurrent.Executors
+import java.util.zip.ZipFile
+import java.util.Locale
+import kotlin.math.min
+
+/** Native reader for local PDF and EPUB, including books prepared by the YES24 client. */
+class StandaloneReaderActivity : Activity() {
+ private val worker = Executors.newSingleThreadExecutor()
+ private var src:Uri?=null
+ private var docId=""
+ private var format=""
+ private var page=0
+ private var total=0
+ private var zoom=110
+ private var lineHeight=160
+ private var hMargin=12
+ private var vMargin=8
+ private var paragraph=8
+ private var indent=0
+ private var fontChoice=0
+ private var alignmentChoice=0
+ private var backgroundChoice=0
+ private var brightness=100
+ private var systemBrightness=true
+ private var showPageInfo=true
+ private var touchPaging=true
+ private var volumePaging=false
+ private var rotationLock=false
+ private var keepScreenOn=false
+ private var autoScroll=false
+ private var gestureBrightness=false
+ private var magnifier=false
+ private var dualPageWide=true
+ private var lastSpreadMode=false
+ private var spreadIndex=0
+ private var pendingSpreadIndex:Int?=null
+ private var pendingLastSpread=false
+ private var tts:TextToSpeech?=null
+ private var ttsReady=false
+ private var ttsPlaying=false
+ private var ttsRate=1.0f
+ private var ttsPitch=1.0f
+ private var ttsVoiceIndex=0
+ private var ttsEngine=""
+ private var ttsVoiceName=""
+ private var ttsMode="ai"
+ private var aiVoiceIndex=0
+ private var ridiVoiceIndex=0
+ private var willaVoiceIndex=0
+ private var aiVoice:AiVoiceEngine?=null
+ private var listeningAction:Button?=null
+ private var ttsAutoLanguage=false
+ private var ttsReadParentheses=true
+ private var ttsSkipHanja=false
+ private var speechParts=emptyList<String>()
+ private var speechEnglish=emptyList<Boolean>()
+ private var speechPart=0
+ private var speechSequence=0
+ private var speechPreparedPage=-1
+ private var speechHighlightEpoch=0
+ private var timerDeadline=0L
+ private var lastChapterNavigation=0L
+ private val mainHandler=Handler(Looper.getMainLooper())
+ private val scrollTick=object:Runnable{override fun run(){
+  if(finished||!autoScroll||format!="epub")return
+  val view=web
+  if(view!=null&&view.progress==100&&System.currentTimeMillis()-lastChapterNavigation>8000L){
+   navigate(1);lastChapterNavigation=System.currentTimeMillis()
+  }
+  mainHandler.postDelayed(this,500)
+ }}
+ private var toc=emptyList<Pair<String,Int>>()
+ private var generation=0
+ private var finished=false
+ private var pdfFd:ParcelFileDescriptor?=null
+ private var pdf:PdfRenderer?=null
+ private var zip:ZipFile?=null
+ private var tmp:File?=null
+ private var spine=emptyList<String>()
+ private var image:ImageView?=null
+ private class PageWebView(context:android.content.Context):WebView(context){
+  fun pageCount():Int{
+   val viewport=width.coerceAtLeast(1)
+   val extent=computeHorizontalScrollRange().coerceAtLeast(viewport)
+   return ((extent.toLong()+viewport-1)/viewport).toInt().coerceIn(1,10000)
+  }
+ }
+ private var web:PageWebView?=null
+ private var indexWeb:PageWebView?=null
+ private var chapterPages=IntArray(0)
+ private var indexEpoch=0
+ private var pageReady=false
+ private lateinit var body:FrameLayout
+ private lateinit var column:LinearLayout
+ private lateinit var progress:TextView
+ private lateinit var zoomOut:Button
+ private lateinit var zoomIn:Button
+ private lateinit var header:LinearLayout
+ private lateinit var footer:LinearLayout
+ private val prefs by lazy { getSharedPreferences("crema_reader", MODE_PRIVATE) }
+ private fun dp(n:Int)=((n*resources.displayMetrics.density)+0.5f).toInt()
+ private fun dark()=com.ckchoi.elibrary.common.GlobalConfig.isDark(this)
+ private fun bg()=when(backgroundChoice){1->Color.rgb(247,239,218);2->Color.rgb(35,39,47);else->if(dark())Color.rgb(20,28,40) else Color.rgb(250,249,245)}
+ private fun fg()=if(backgroundChoice==2||backgroundChoice==0&&dark())Color.WHITE else Color.rgb(48,32,20)
+ private fun twoPages()=dualPageWide&&resources.configuration.screenWidthDp>=600
+ private fun button(label:String, onTap:()->Unit)=Button(this).apply {
+  text=label;textSize=13f;isAllCaps=false;setTextColor(fg());setBackgroundColor(bg());setOnClickListener{onTap()}
+ }
+ override fun onCreate(state:Bundle?){
+  super.onCreate(state)
+  src=intent.data
+  format=intent.getStringExtra("format").orEmpty()
+  if(src==null||format !in setOf("pdf","epub")){finish();return}
+  docId=MessageDigest.getInstance("SHA-256").digest(intent.getStringExtra("documentId").orEmpty().ifBlank{src.toString()}.toByteArray()).take(12).joinToString(""){"%02x".format(it)}
+  intent.getStringExtra("libraryBookId")?.let { getSharedPreferences("ckreader_library",MODE_PRIVATE).edit().putLong("last_"+it,System.currentTimeMillis()).apply() }
+  loadSettings()
+  if(format=="epub")pendingSpreadIndex=intent.getIntExtra("restoreSpread",prefs.getInt("spread_"+docId,0)).coerceAtLeast(0)
+  intent.removeExtra("restoreSpread")
+  lastSpreadMode=twoPages()
+  drawScreen()
+  if(format=="pdf")openPdf() else openEpub()
+ }
+ private fun drawScreen(){
+  androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window,false)
+  window.statusBarColor=bg();window.navigationBarColor=bg()
+  window.decorView.systemUiVisibility=if(dark())0 else View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+  column=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL;setBackgroundColor(bg())}
+  androidx.core.view.ViewCompat.setOnApplyWindowInsetsListener(column){view,insets->
+   val bars=insets.getInsets(androidx.core.view.WindowInsetsCompat.Type.systemBars() or androidx.core.view.WindowInsetsCompat.Type.displayCutout())
+   view.setPadding(bars.left,bars.top,bars.right,bars.bottom)
+   androidx.core.view.WindowInsetsCompat.CONSUMED
+  }
+  header=LinearLayout(this).apply{gravity=Gravity.CENTER_VERTICAL;orientation=LinearLayout.HORIZONTAL}
+  header.addView(button("‹ 뒤로"){finish()},LinearLayout.LayoutParams(dp(90),dp(52)))
+  val title=TextView(this).apply{text=if(format=="pdf")"PDF 뷰어" else "EPUB 뷰어";gravity=Gravity.CENTER;textSize=18f;setTextColor(fg())}
+  header.addView(title,LinearLayout.LayoutParams(0,dp(52),1f))
+  val note=TextView(this).apply{text="도서 뷰어";textSize=10f;gravity=Gravity.CENTER;setTextColor(fg())}
+  header.addView(note,LinearLayout.LayoutParams(dp(65),dp(52)))
+  column.addView(header,LinearLayout.LayoutParams(-1,dp(52)))
+  body=FrameLayout(this).apply{setBackgroundColor(bg())}
+  column.addView(body,LinearLayout.LayoutParams(-1,0,1f))
+  showMessage("문서를 여는 중입니다...")
+  footer=LinearLayout(this).apply{orientation=LinearLayout.HORIZONTAL;gravity=Gravity.CENTER}
+  footer.addView(button("이전"){navigate(-1)},LinearLayout.LayoutParams(0,dp(52),1f))
+  progress=TextView(this).apply{gravity=Gravity.CENTER;textSize=13f;setTextColor(fg())}
+  footer.addView(progress,LinearLayout.LayoutParams(0,dp(52),1.3f))
+  zoomOut=button("A−"){changeZoom(-10)}
+  zoomIn=button("A+"){changeZoom(10)}
+  footer.addView(zoomOut,LinearLayout.LayoutParams(0,dp(52),.8f))
+  footer.addView(zoomIn,LinearLayout.LayoutParams(0,dp(52),.8f))
+  footer.addView(button("다음"){navigate(1)},LinearLayout.LayoutParams(0,dp(52),1f))
+  column.addView(footer,LinearLayout.LayoutParams(-1,dp(52)))
+  val menu=LinearLayout(this).apply{orientation=LinearLayout.HORIZONTAL;gravity=Gravity.CENTER}
+  menu.addView(button("듣기"){showListening()},LinearLayout.LayoutParams(0,dp(47),1f))
+  menu.addView(button("목차"){showContents()},LinearLayout.LayoutParams(0,dp(47),1f))
+  menu.addView(button("보기설정"){showStyleSettings()},LinearLayout.LayoutParams(0,dp(47),1f))
+  menu.addView(button("화면설정"){showScreenSettings()},LinearLayout.LayoutParams(0,dp(47),1f))
+  column.addView(menu,LinearLayout.LayoutParams(-1,dp(47)))
+  zoomOut.visibility=if(format=="epub")View.VISIBLE else View.GONE
+  zoomIn.visibility=if(format=="epub")View.VISIBLE else View.GONE
+  setContentView(column)
+  applyWindowSettings()
+  androidx.core.view.ViewCompat.requestApplyInsets(column)
+ }
+ private fun showMessage(message:String){
+  body.removeAllViews()
+  body.addView(TextView(this).apply{
+   text=message;gravity=Gravity.CENTER;textSize=14f;setTextColor(fg());setPadding(dp(20),0,dp(20),0)
+  },FrameLayout.LayoutParams(-1,-1))
+ }
+ private fun fail(message:String)=runOnUiThread{if(!finished)showMessage(message)}
+ private fun savePage(){
+  val edit=prefs.edit().putInt("index_"+docId,page)
+  if(format=="epub")edit.putInt("spread_"+docId,spreadIndex)
+  edit.apply()
+ }
+ private fun updateProgress(){
+  progress.text=if(format=="pdf"&&twoPages()){
+   val end=min(page+2,total);"${page+1}–$end / $total"
+  }else if(format=="epub"){
+   val counts=chapterPages
+   if(counts.size==total&&counts.all{it>0}){
+    val position=counts.take(page).sum()+spreadIndex.coerceIn(0,counts[page]-1)+1
+    "$position / ${counts.sum()}"
+   }else{
+    val count=counts.getOrNull(page)?.takeIf{it>0}
+    if(count==null)"페이지 계산 중" else "${page+1}장 · ${spreadIndex+1}/$count · 계산 중"
+   }
+  }else "${page+1} / $total"
+ }
+ private fun navigate(direction:Int){
+  if(format=="pdf"){showPage(page+direction*(if(twoPages())2 else 1));return}
+  val view=web
+  if(view==null||!pageReady)return
+  val count=chapterPages.getOrNull(page)?.coerceAtLeast(1)?:return
+  val target=spreadIndex+direction
+  if(target in 0 until count){
+   spreadIndex=target
+   view.scrollTo(target*view.width,0)
+   savePage();updateProgress();return
+  }
+  pendingLastSpread=direction<0&&page+direction>=0
+  showPage(page+direction)
+ }
+ private fun showPage(index:Int){
+  if(index<0||index>=total)return
+  val target=if(format=="pdf"&&twoPages())index-index%2 else index
+  if(target!=page&&ttsPlaying)stopSpeaking()
+  if(target!=page)clearSpeechHighlight()
+  page=target
+  if(format=="epub"){spreadIndex=0;pageReady=false}
+  lastChapterNavigation=System.currentTimeMillis()
+  updateProgress()
+  savePage()
+  if(format=="pdf")renderPdf() else {
+   web?.loadUrl(spineUrl(page))
+  }
+ }
+ private fun openPdf(){
+  try {
+   pdfFd=contentResolver.openFileDescriptor(src!!,"r")?:throw IllegalArgumentException()
+   pdf=PdfRenderer(pdfFd!!)
+   total=pdf!!.pageCount
+   if(total<1)throw IllegalArgumentException()
+   page=prefs.getInt("index_"+docId,0).coerceIn(0,total-1)
+   val pic=ImageView(this).apply{
+    scaleType=ImageView.ScaleType.FIT_CENTER
+    setBackgroundColor(if(dark())Color.rgb(35,38,48) else Color.rgb(235,233,227))
+   }
+   var downX=0f;var downY=0f
+   pic.setOnTouchListener{_,evt->
+    when(evt.actionMasked){
+     MotionEvent.ACTION_DOWN->{downX=evt.x;downY=evt.y;true}
+     MotionEvent.ACTION_UP->{
+      val delta=evt.x-downX;val dy=evt.y-downY
+      if(gestureBrightness&&downX>pic.width*.8f&&kotlin.math.abs(dy)>dp(60)&&kotlin.math.abs(dy)>kotlin.math.abs(delta)){
+       brightness=(brightness-dy.toInt()/dp(8)).coerceIn(10,100);systemBrightness=false;saveSettings()
+       window.attributes=window.attributes.apply{screenBrightness=brightness/100f}
+      }else if(delta>dp(70))navigate(-1) else if(delta< -dp(70))navigate(1)
+      else if(touchPaging&&kotlin.math.abs(dy)<dp(15)){
+       if(evt.x<pic.width*.18f)navigate(-1) else if(evt.x>pic.width*.82f)navigate(1)
+      };true
+     }
+     else->true
+    }
+   }
+   image=pic
+   body.removeAllViews()
+   body.addView(pic,FrameLayout.LayoutParams(-1,-1))
+   showPage(page)
+  }catch(_:Exception){showMessage("PDF를 열 수 없습니다.\n암호로 보호되거나 지원하지 않는 파일일 수 있습니다.")}
+ }
+ private fun renderPdf(){
+  val pageIndex=page
+  val spread=twoPages()
+  val viewportWidth=body.width.takeIf{it>0}?:resources.displayMetrics.widthPixels
+  val viewportHeight=body.height.takeIf{it>0}?:resources.displayMetrics.heightPixels
+  val job=++generation
+  worker.execute {
+   var bitmap:Bitmap?=null
+   try {
+    if(spread){
+     val bw=(viewportWidth*1.3f).toInt().coerceIn(800,3200)
+     val bh=(viewportHeight*1.3f).toInt().coerceIn(800,3600)
+     bitmap=Bitmap.createBitmap(bw,bh,Bitmap.Config.ARGB_8888)
+     bitmap!!.eraseColor(Color.WHITE)
+     val slotWidth=bw/2
+     for(side in 0..1){
+      val targetPage=pageIndex+side
+      if(targetPage>=total)break
+      pdf!!.openPage(targetPage).use{p->
+       val margin=(16*resources.displayMetrics.density).toInt().coerceAtLeast(12)
+       val scale=min((slotWidth-2*margin).toFloat()/p.width,(bh-2*margin).toFloat()/p.height)
+       val pageWidth=(p.width*scale).toInt().coerceAtLeast(1)
+       val pageHeight=(p.height*scale).toInt().coerceAtLeast(1)
+       val left=side*slotWidth+(slotWidth-pageWidth)/2
+       val top=(bh-pageHeight)/2
+       p.render(bitmap!!,Rect(left,top,left+pageWidth,top+pageHeight),null,PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+      }
+     }
+     Canvas(bitmap!!).drawLine(slotWidth.toFloat(),0f,slotWidth.toFloat(),bh.toFloat(),Paint().apply{color=Color.LTGRAY;strokeWidth=2f})
+    }else pdf!!.openPage(pageIndex).use { p ->
+      val width=viewportWidth.coerceAtLeast(400)
+      val scale=min(2f,width.toFloat()/p.width)
+      val bw=(p.width*scale).toInt().coerceIn(1,2500)
+      val bh=(p.height*scale).toInt().coerceIn(1,3500)
+      bitmap=Bitmap.createBitmap(bw,bh,Bitmap.Config.ARGB_8888)
+      bitmap!!.eraseColor(Color.WHITE)
+      p.render(bitmap!!,null,null,PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY)
+     }
+    runOnUiThread {if(finished||job!=generation)bitmap?.recycle() else image?.setImageBitmap(bitmap)}
+   }catch(_:Exception){bitmap?.recycle();fail("PDF 페이지를 렌더링할 수 없습니다.")}
+  }
+ }
+ private fun normalPath(path:String):String{
+  val components=ArrayList<String>()
+  for(part in path.replace('\\','/').removePrefix("/").split('/')){
+   when(part){
+    "", "." -> Unit
+    ".."->{if(components.isEmpty())throw IllegalArgumentException();components.removeAt(components.size-1)}
+    else->components.add(part)
+   }
+  }
+  return components.joinToString("/")
+ }
+ private fun parseXml(input:InputStream,onTag:(XmlPullParser)->Unit){
+  input.use{
+   val parser=Xml.newPullParser()
+   parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES,true)
+   parser.setInput(it,null)
+   var events=0
+   while(true){
+    if(++events>200_000)throw IllegalArgumentException("EPUB XML이 너무 복잡합니다.")
+    when(parser.next()){
+     XmlPullParser.END_DOCUMENT->return
+     XmlPullParser.START_TAG->onTag(parser)
+    }
+   }
+  }
+ }
+ private fun readSpine(archive:ZipFile):List<String>{
+  val container=archive.getEntry("META-INF/container.xml")?:throw IllegalArgumentException()
+  if(container.size !in 1L..2_000_000L)throw IllegalArgumentException()
+  var rootPath=""
+  parseXml(archive.getInputStream(container)){p->if(p.name=="rootfile"&&rootPath.isEmpty())rootPath=p.getAttributeValue(null,"full-path").orEmpty()}
+  if(rootPath.isEmpty())throw IllegalArgumentException()
+  val opfPath=normalPath(rootPath)
+  val opf=archive.getEntry(opfPath)?:throw IllegalArgumentException()
+  if(opf.size !in 1L..2_000_000L)throw IllegalArgumentException()
+  val dir=opfPath.substringBeforeLast('/',"").trim()
+  val refs=HashMap<String,String>()
+  val order=ArrayList<String>()
+  parseXml(archive.getInputStream(opf)){p->
+   when(p.name){
+    "item"->{
+     val id=p.getAttributeValue(null,"id").orEmpty()
+     val href=p.getAttributeValue(null,"href").orEmpty().substringBefore('#')
+     val media=p.getAttributeValue(null,"media-type").orEmpty()
+     if(id.isNotBlank()&&href.isNotBlank()&&media in setOf("text/html","application/xhtml+xml")){
+      val path=normalPath(if(dir.isEmpty())href else dir+"/"+href)
+      if(archive.getEntry(path)!=null)refs[id]=path
+     }
+    }
+    "itemref"->p.getAttributeValue(null,"idref")?.let{order.add(it)}
+   }
+  }
+  val chapters=order.mapNotNull{refs[it]}
+  if(chapters.isEmpty())throw IllegalArgumentException()
+  return chapters
+ }
+ private fun readToc(archive:ZipFile,chapters:List<String>):List<Pair<String,Int>>{
+  val archiveEntries=archive.entries()
+  var tocPath:String?=null
+  var navPath:String?=null
+  while(archiveEntries.hasMoreElements()){
+   val path=archiveEntries.nextElement().name
+   if(path.endsWith(".ncx",true))tocPath=path
+   if(path.endsWith("nav.xhtml",true)||path.endsWith("toc.xhtml",true))navPath=path
+  }
+  fun chapterIndex(base:String,href:String):Int{
+   val path=runCatching{normalPath(base.substringBeforeLast('/',"")+"/"+Uri.decode(href.substringBefore('#')))}.getOrNull()?:return -1
+   return chapters.indexOf(path)
+  }
+  data class TocItem(var title:String="",var href:String="")
+  val entries=ArrayList<Pair<String,Int>>()
+  if(tocPath!=null)runCatching{
+   val parser=Xml.newPullParser().apply{setInput(archive.getInputStream(archive.getEntry(tocPath)),null)}
+   val stack=ArrayList<TocItem>()
+   while(true){when(parser.next()){
+    XmlPullParser.END_DOCUMENT->break
+    XmlPullParser.START_TAG->when(parser.name){
+     "navPoint"->stack.add(TocItem())
+     "content"->if(stack.isNotEmpty())stack.last().href=parser.getAttributeValue(null,"src").orEmpty()
+     "text"->if(stack.isNotEmpty())stack.last().title=parser.nextText().trim()
+    }
+    XmlPullParser.END_TAG->if(parser.name=="navPoint"&&stack.isNotEmpty()){
+     val item=stack.removeAt(stack.lastIndex);val index=chapterIndex(tocPath!!,item.href)
+     if(index>=0&&item.title.isNotBlank())entries.add(item.title to index)
+    }
+   }}
+  }
+  if(entries.isEmpty()&&navPath!=null)runCatching{
+   val nav=archive.getInputStream(archive.getEntry(navPath)).bufferedReader().use{it.readText()}
+   val regex=Regex("(?is)<a\\b[^>]*href\\s*=\\s*['\"]([^'\"]+)['\"][^>]*>(.*?)</a>")
+   for(match in regex.findAll(nav)){
+    val index=chapterIndex(navPath!!,match.groupValues[1])
+    val title=Html.fromHtml(match.groupValues[2],Html.FROM_HTML_MODE_LEGACY).toString().trim()
+    if(index>=0&&title.isNotBlank())entries.add(title to index)
+   }
+  }
+  if(entries.isEmpty())return chapters.mapIndexed{index,path->
+   val raw=path.substringAfterLast('/').substringBeforeLast('.').replace('_',' ').replace('-',' ')
+   (raw.ifBlank{"${index+1}장"}) to index
+  }
+  return entries.distinct()
+ }
+ private fun styledXhtml(source:String):String{
+  val family=when(fontChoice){1->"serif";2->"sans-serif";else->"inherit"}
+  val color=String.format("#%06X",fg() and 0xffffff)
+  val background=String.format("#%06X",bg() and 0xffffff)
+  val alignment=when(alignmentChoice){1->"left";2->"center";else->"justify"}
+  val columns=if(twoPages())2 else 1
+  val css="""<style type="text/css">html,body{background:$background !important;color:$color !important;margin:0 !important;}html{height:100% !important;overflow-x:auto !important;overflow-y:hidden !important;}body{box-sizing:border-box !important;width:100vw !important;height:100vh !important;overflow:visible !important;column-count:$columns !important;column-gap:${hMargin*2}px !important;column-fill:auto !important;font-family:$family !important;line-height:${lineHeight/100f} !important;padding:${vMargin}px ${hMargin}px !important;}body>*{max-width:100% !important;}p{margin-bottom:${paragraph}px !important;text-indent:${indent}px !important;text-align:$alignment !important;}img,svg{max-width:100% !important;max-height:calc(100vh - ${vMargin*2}px) !important;object-fit:contain !important;}</style>"""
+  val match=Regex("(?i)</head\\s*>").find(source)
+  return if(match!=null)source.replaceRange(match.range.first,match.range.first,css)
+   else source.replace(Regex("(?i)<html([^>]*)>"),"<html$1><head>$css</head>")
+ }
+ private fun epubResource(archive:ZipFile,request:WebResourceRequest):WebResourceResponse{
+  val uri=request.url
+  if(uri.scheme!="https"||uri.host!="epub.local")return emptyResponse()
+  val path=try{normalPath(uri.path.orEmpty())}catch(_:Exception){""}
+  val entry=archive.getEntry(path)
+  if(entry==null||entry.isDirectory||entry.size>20L*1024L*1024L)return emptyResponse()
+  val mime=when(path.substringAfterLast('.',"").lowercase()){
+   "xhtml","html","htm"->"application/xhtml+xml"
+   "css"->"text/css"
+   "jpg","jpeg"->"image/jpeg"
+   "png"->"image/png"
+   "gif"->"image/gif"
+   "svg"->"image/svg+xml"
+   "ttf"->"font/ttf"
+   "otf"->"font/otf"
+   "woff"->"font/woff"
+   "woff2"->"font/woff2"
+   else->"application/octet-stream"
+  }
+  if(mime=="application/xhtml+xml"||mime=="text/html"){
+   val source=archive.getInputStream(entry).bufferedReader().use{it.readText()}
+   return WebResourceResponse(mime,"UTF-8",styledXhtml(source).byteInputStream())
+  }
+  return WebResourceResponse(mime,"UTF-8",archive.getInputStream(entry))
+ }
+ private fun spineUrl(index:Int):String="https://epub.local/"+spine[index].split('/').joinToString("/"){Uri.encode(it)}
+ private fun pageIndexKey():String="pages_${docId}_${body.width}x${body.height}_${zoom}_${lineHeight}_${hMargin}_${vMargin}_${paragraph}_${indent}_${fontChoice}_${alignmentChoice}_${twoPages()}"
+ private fun startPageIndex(archive:ZipFile){
+  indexEpoch++
+  indexWeb?.let{body.removeView(it);it.destroy()}
+  indexWeb=null
+  val cacheKey=pageIndexKey()
+  val cached=prefs.getString(cacheKey,null)?.split(',')?.mapNotNull{it.toIntOrNull()}
+  if(cached!=null&&cached.size==total&&cached.all{it in 1..10000}){
+   chapterPages=cached.toIntArray()
+   updateProgress()
+   return
+  }
+  chapterPages=IntArray(total)
+  updateProgress()
+  val epoch=indexEpoch
+  var position=0
+  val indexer=PageWebView(this).apply{
+   settings.javaScriptEnabled=false
+   settings.domStorageEnabled=false
+   settings.allowFileAccess=false
+   settings.allowContentAccess=false
+   settings.mixedContentMode=WebSettings.MIXED_CONTENT_NEVER_ALLOW
+   settings.cacheMode=WebSettings.LOAD_NO_CACHE
+   settings.textZoom=zoom
+   visibility=View.INVISIBLE
+   isClickable=false
+   importantForAccessibility=View.IMPORTANT_FOR_ACCESSIBILITY_NO
+   webViewClient=object:WebViewClient(){
+    override fun onPageFinished(v:WebView,url:String){
+     v.postDelayed({
+      if(finished||epoch!=indexEpoch)return@postDelayed
+      val measured=(v as PageWebView).pageCount()
+      chapterPages[position]=measured
+      updateProgress()
+      position++
+      if(position<total)v.loadUrl(spineUrl(position))
+      else{
+       prefs.edit().putString(cacheKey,chapterPages.joinToString(",")).apply()
+       body.removeView(v);v.destroy();indexWeb=null
+       updateProgress()
+      }
+     },300)
+    }
+    override fun shouldInterceptRequest(v:WebView,request:WebResourceRequest)=epubResource(archive,request)
+   }
+  }
+  indexWeb=indexer
+  body.addView(indexer,0,FrameLayout.LayoutParams(-1,-1))
+  indexer.loadUrl(spineUrl(position))
+ }
+ private fun openEpub(){
+  worker.execute{
+   try {
+    val dir=File(cacheDir,"crema_reader").apply{mkdirs()}
+    val file=File.createTempFile("crema-", ".epub", dir)
+    tmp=file
+    contentResolver.openInputStream(src!!)!!.use{input->
+     file.outputStream().use{output->
+      val buf=ByteArray(65536);var totalSize=0L
+      while(true){
+       val n=input.read(buf)
+       if(n<0)break
+       totalSize+=n
+       if(totalSize>150L*1024L*1024L)throw IllegalArgumentException()
+       output.write(buf,0,n)
+      }
+     }
+    }
+    val archive=ZipFile(file)
+    zip=archive
+    val chapters=readSpine(archive)
+    val contents=readToc(archive,chapters)
+    runOnUiThread {
+     if(finished)return@runOnUiThread
+     spine=chapters;toc=contents;total=spine.size
+     page=prefs.getInt("index_"+docId,0).coerceIn(0,total-1)
+     val view=PageWebView(this).apply {
+      settings.javaScriptEnabled=false
+      settings.domStorageEnabled=false
+      settings.allowFileAccess=false
+      settings.allowContentAccess=false
+      settings.mixedContentMode=WebSettings.MIXED_CONTENT_NEVER_ALLOW
+      settings.cacheMode=WebSettings.LOAD_NO_CACHE
+      settings.textZoom=zoom
+      settings.builtInZoomControls=magnifier
+      settings.displayZoomControls=false
+      setBackgroundColor(bg())
+      var downX=0f;var downY=0f
+      setOnTouchListener{_,event->
+       when(event.actionMasked){
+        MotionEvent.ACTION_DOWN->{downX=event.x;downY=event.y}
+        MotionEvent.ACTION_UP->{
+         val dx=event.x-downX;val dy=event.y-downY
+         if(gestureBrightness&&downX>width*.8f&&kotlin.math.abs(dy)>dp(60)&&kotlin.math.abs(dy)>kotlin.math.abs(dx)){
+          brightness=(brightness-dy.toInt()/dp(8)).coerceIn(10,100);systemBrightness=false;saveSettings()
+          window.attributes=window.attributes.apply{screenBrightness=brightness/100f}
+         }
+         if(kotlin.math.abs(dx)>dp(65)&&kotlin.math.abs(dx)>kotlin.math.abs(dy)){
+          navigate(if(dx<0)1 else -1)
+         }else if(touchPaging&&kotlin.math.abs(dx)<dp(15)&&kotlin.math.abs(dy)<dp(15)&&event.x<width*.18f)navigate(-1)
+         else if(touchPaging&&kotlin.math.abs(dx)<dp(15)&&kotlin.math.abs(dy)<dp(15)&&event.x>width*.82f)navigate(1)
+         else if(kotlin.math.abs(dx)<dp(15)&&kotlin.math.abs(dy)<dp(15)){
+          val down=MotionEvent.obtain(event).apply{action=MotionEvent.ACTION_DOWN}
+          onTouchEvent(down);down.recycle();onTouchEvent(event)
+         }
+        }
+       };true
+      }
+      webViewClient=object:WebViewClient(){
+       override fun onPageFinished(v:WebView,url:String){
+        v.postDelayed({
+         if(finished||url!=spineUrl(page))return@postDelayed
+         val count=(v as PageWebView).pageCount()
+         chapterPages[page]=count
+         pageReady=true
+         val restore=pendingSpreadIndex
+         if(restore!=null){
+          pendingSpreadIndex=null
+          spreadIndex=restore.coerceIn(0,count-1)
+         }else if(pendingLastSpread){
+          pendingLastSpread=false;spreadIndex=count-1
+         }else spreadIndex=spreadIndex.coerceIn(0,count-1)
+         v.scrollTo(spreadIndex*v.width,0)
+         savePage()
+         updateProgress()
+        },400)
+       }
+       override fun shouldOverrideUrlLoading(v:WebView,request:WebResourceRequest):Boolean =
+        request.url.scheme!="https"||request.url.host!="epub.local"
+       override fun shouldInterceptRequest(v:WebView,request:WebResourceRequest)=epubResource(archive,request)
+      }
+     }
+     web=view;body.removeAllViews();body.addView(view,FrameLayout.LayoutParams(-1,-1))
+     showPage(page)
+     body.post{if(!finished)startPageIndex(archive)}
+    }
+   }catch(e:Exception){android.util.Log.e("CremaReader","EPUB open failed",e);tmp?.delete();fail("EPUB 파일을 열 수 없습니다.\nDRM이 적용된 파일이거나 EPUB 구조가 지원되지 않습니다.")}
+  }
+ }
+ private fun emptyResponse()=WebResourceResponse("text/plain","UTF-8",ByteArray(0).inputStream())
+ private fun changeZoom(step:Int){
+  if(format!="epub")return
+  zoom=(zoom+step).coerceIn(70,200)
+  web?.settings?.textZoom=zoom
+  saveSettings()
+ }
+ private fun settingsKey(name:String)= (if(prefs.getBoolean("all_books",false))"all_" else "book_${docId}_")+name
+ private fun loadSettings(){
+  zoom=prefs.getInt(settingsKey("zoom"),110)
+  lineHeight=prefs.getInt(settingsKey("line"),160)
+  hMargin=prefs.getInt(settingsKey("hmargin"),12)
+  vMargin=prefs.getInt(settingsKey("vmargin"),8)
+  paragraph=prefs.getInt(settingsKey("paragraph"),8)
+  indent=prefs.getInt(settingsKey("indent"),0)
+  fontChoice=prefs.getInt(settingsKey("font"),0)
+  alignmentChoice=prefs.getInt(settingsKey("alignment"),0)
+  backgroundChoice=prefs.getInt(settingsKey("background"),0)
+  brightness=prefs.getInt(settingsKey("brightness"),100)
+  systemBrightness=prefs.getBoolean(settingsKey("system_brightness"),true)
+  showPageInfo=prefs.getBoolean(settingsKey("page_info"),true)
+  touchPaging=prefs.getBoolean(settingsKey("touch_paging"),true)
+  volumePaging=prefs.getBoolean(settingsKey("volume_paging"),false)
+  rotationLock=prefs.getBoolean(settingsKey("rotation_lock"),false)
+  keepScreenOn=prefs.getBoolean(settingsKey("keep_screen_on"),false)
+  autoScroll=prefs.getBoolean(settingsKey("auto_scroll"),false)
+  gestureBrightness=prefs.getBoolean(settingsKey("gesture_brightness"),false)
+  magnifier=prefs.getBoolean(settingsKey("magnifier"),false)
+  dualPageWide=prefs.getBoolean(settingsKey("dual_page_wide"),true)
+  ttsRate=prefs.getFloat("tts_rate",1.0f)
+  ttsPitch=prefs.getFloat("tts_pitch",1.0f)
+  ttsVoiceIndex=prefs.getInt("tts_voice",0)
+  ttsEngine=prefs.getString("tts_engine","").orEmpty()
+  ttsVoiceName=prefs.getString("tts_voice_name","").orEmpty()
+  ttsMode=prefs.getString("tts_mode","ai").orEmpty()
+  if(ttsEngine=="com.samsung.SMT"){
+   ttsEngine="";ttsMode="ai";ttsVoiceName="";ttsVoiceIndex=0
+   prefs.edit().remove("tts_engine").remove("tts_voice_name").putString("tts_mode","ai").putInt("tts_voice",0).apply()
+  }
+  aiVoiceIndex=prefs.getInt("ai_voice",0).coerceIn(0,AiVoiceData.names.lastIndex)
+  ridiVoiceIndex=prefs.getInt("ridi_voice",0).coerceIn(0,RidiVoiceData.names.lastIndex)
+  willaVoiceIndex=prefs.getInt("willa_voice",0).coerceIn(0,WillaVoices.names.lastIndex)
+  if(ttsMode=="ai"&&!VoiceModules.installed(this,"yes24") ||
+   ttsMode=="ridi"&&!VoiceModules.installed(this,"ridi") ||
+   ttsMode=="willa"&&!VoiceModules.installed(this,"willa")){
+   ttsMode=when {
+    VoiceModules.installed(this,"yes24")->"ai"
+    VoiceModules.installed(this,"ridi")->"ridi"
+    VoiceModules.installed(this,"willa")->"willa"
+    else->"android"
+   }
+  }
+  ttsAutoLanguage=prefs.getBoolean("tts_auto_language",false)
+  ttsReadParentheses=prefs.getBoolean("tts_read_parentheses",true)
+  ttsSkipHanja=prefs.getBoolean("tts_skip_hanja",false)
+ }
+ private fun saveSettings(){
+  prefs.edit().putInt(settingsKey("zoom"),zoom).putInt(settingsKey("line"),lineHeight)
+   .putInt(settingsKey("hmargin"),hMargin).putInt(settingsKey("vmargin"),vMargin)
+   .putInt(settingsKey("paragraph"),paragraph).putInt(settingsKey("indent"),indent)
+   .putInt(settingsKey("font"),fontChoice).putInt(settingsKey("alignment"),alignmentChoice).putInt(settingsKey("background"),backgroundChoice)
+   .putInt(settingsKey("brightness"),brightness).putBoolean(settingsKey("system_brightness"),systemBrightness)
+   .putBoolean(settingsKey("page_info"),showPageInfo).putBoolean(settingsKey("touch_paging"),touchPaging)
+   .putBoolean(settingsKey("volume_paging"),volumePaging).putBoolean(settingsKey("rotation_lock"),rotationLock)
+   .putBoolean(settingsKey("keep_screen_on"),keepScreenOn)
+   .putBoolean(settingsKey("auto_scroll"),autoScroll).putBoolean(settingsKey("gesture_brightness"),gestureBrightness)
+   .putBoolean(settingsKey("magnifier"),magnifier).putBoolean(settingsKey("dual_page_wide"),dualPageWide).apply()
+ }
+ private fun applyWindowSettings(){
+  window.statusBarColor=bg();window.navigationBarColor=bg()
+  window.decorView.systemUiVisibility=if(backgroundChoice==2||backgroundChoice==0&&dark())0 else View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR or View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR
+  window.attributes=window.attributes.apply{screenBrightness=if(systemBrightness)-1f else brightness/100f}
+  if(keepScreenOn)window.addFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+  else window.clearFlags(android.view.WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+  requestedOrientation=if(rotationLock)ActivityInfo.SCREEN_ORIENTATION_LOCKED else ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+  progress.visibility=if(showPageInfo)View.VISIBLE else View.INVISIBLE
+  if(::column.isInitialized){
+   column.setBackgroundColor(bg())
+   fun repaint(view:View){
+    if(view is WebView||view===body)return
+    if(view is Button){view.setTextColor(fg());view.setBackgroundColor(bg())}
+    else if(view is TextView)view.setTextColor(fg())
+    if(view is ViewGroup)for(i in 0 until view.childCount)repaint(view.getChildAt(i))
+   }
+   repaint(column)
+  }
+  body.setBackgroundColor(bg())
+  image?.setBackgroundColor(bg())
+  web?.setBackgroundColor(bg())
+  web?.settings?.textZoom=zoom
+  web?.settings?.builtInZoomControls=magnifier
+  if(format=="pdf"&&twoPages())page-=page%2
+  lastSpreadMode=twoPages()
+  if(format=="epub")web?.let{
+   pendingSpreadIndex=spreadIndex;pageReady=false;it.reload()
+   zip?.let{archive->body.post{if(!finished)startPageIndex(archive)}}
+  } else if(total>0)renderPdf()
+  mainHandler.removeCallbacks(scrollTick)
+  if(autoScroll&&format=="epub")mainHandler.postDelayed(scrollTick,90)
+ }
+ private fun settingRow(label:String,initial:Boolean,onChange:(Boolean)->Unit):Switch = Switch(this).apply{
+  text=label;textSize=15f;isChecked=initial;setPadding(dp(12),dp(6),dp(12),dp(6))
+  setOnCheckedChangeListener{_,value->onChange(value);saveSettings();applyWindowSettings()}
+ }
+ private fun seekRow(label:String,minValue:Int,maxValue:Int,current:Int,onChange:(Int)->Unit):LinearLayout {
+  val row=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL;setPadding(dp(12),dp(7),dp(12),dp(7))}
+  val caption=TextView(this).apply{text="$label  $current";textSize=15f;setTextColor(fg())}
+  val seek=SeekBar(this).apply{max=maxValue-minValue;progress=current-minValue}
+  seek.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener{
+   override fun onProgressChanged(bar:SeekBar?,value:Int,fromUser:Boolean){if(fromUser){val n=minValue+value;caption.text="$label  $n";onChange(n)}}
+   override fun onStartTrackingTouch(bar:SeekBar?){}
+   override fun onStopTrackingTouch(bar:SeekBar?){saveSettings();applyWindowSettings()}
+  })
+  row.addView(caption);row.addView(seek);return row
+ }
+ private fun speechSeekRow(label:String,minTenths:Int,maxTenths:Int,currentTenths:Int,onChange:(Float)->Unit):LinearLayout{
+  val row=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL;setPadding(dp(12),dp(7),dp(12),dp(7))}
+  val caption=TextView(this).apply{text="$label  ${currentTenths/10f}×";textSize=15f;setTextColor(fg())}
+  val seek=SeekBar(this).apply{max=maxTenths-minTenths;progress=currentTenths-minTenths}
+  seek.setOnSeekBarChangeListener(object:SeekBar.OnSeekBarChangeListener{
+   override fun onProgressChanged(bar:SeekBar?,value:Int,fromUser:Boolean){if(fromUser){val selected=(minTenths+value)/10f;caption.text="$label  $selected×";onChange(selected)}}
+   override fun onStartTrackingTouch(bar:SeekBar?){}
+   override fun onStopTrackingTouch(bar:SeekBar?){}
+  })
+  row.addView(caption);row.addView(seek);return row
+ }
+ private fun settingsPanel(title:String, build:(LinearLayout)->Unit){
+  val scroll=ScrollView(this)
+  val list=LinearLayout(this).apply{orientation=LinearLayout.VERTICAL;setPadding(dp(10),dp(4),dp(10),dp(4))}
+  build(list);scroll.addView(list)
+  AlertDialog.Builder(this).setTitle(title).setView(scroll).setPositiveButton("닫기",null).show()
+ }
+ private fun showStyleSettings(){
+  settingsPanel("보기설정") { list ->
+   list.addView(settingRow("모든 책에 적용",prefs.getBoolean("all_books",false)){value->
+    prefs.edit().putBoolean("all_books",value).apply();saveSettings()
+   })
+   if(format=="epub"){
+    list.addView(seekRow("글자 크기",70,200,zoom){zoom=it})
+    val fonts=arrayOf("원본글꼴","명조","고딕")
+    list.addView(button("글꼴 · ${fonts[fontChoice.coerceIn(0,2)]}"){
+     AlertDialog.Builder(this).setTitle("글꼴").setSingleChoiceItems(fonts,fontChoice){dialog,which->fontChoice=which;saveSettings();applyWindowSettings();dialog.dismiss()}.show()
+    })
+    list.addView(seekRow("줄 간격",100,240,lineHeight){lineHeight=it})
+    list.addView(seekRow("좌우 여백",0,48,hMargin){hMargin=it})
+    list.addView(seekRow("상하 여백",0,48,vMargin){vMargin=it})
+    list.addView(seekRow("문단 간격",0,32,paragraph){paragraph=it})
+    list.addView(seekRow("들여쓰기",0,48,indent){indent=it})
+    val alignments=arrayOf("양쪽 정렬","왼쪽 정렬","가운데 정렬")
+    list.addView(button("문단 정렬 · ${alignments[alignmentChoice.coerceIn(0,2)]}"){
+     AlertDialog.Builder(this).setTitle("문단 정렬").setSingleChoiceItems(alignments,alignmentChoice){dialog,which->alignmentChoice=which;saveSettings();applyWindowSettings();dialog.dismiss()}.show()
+    })
+   }
+   val backgrounds=arrayOf("기본","미색","어둡게")
+   list.addView(button("배경 색 · ${backgrounds[backgroundChoice.coerceIn(0,2)]}"){
+    AlertDialog.Builder(this).setTitle("배경 색").setSingleChoiceItems(backgrounds,backgroundChoice){dialog,which->backgroundChoice=which;saveSettings();applyWindowSettings();dialog.dismiss()}.show()
+   })
+   list.addView(settingRow("시스템 밝기",systemBrightness){systemBrightness=it})
+   list.addView(seekRow("밝기",10,100,brightness){brightness=it;systemBrightness=false})
+   list.addView(button("설정 초기화"){
+    zoom=110;lineHeight=160;hMargin=12;vMargin=8;paragraph=8;indent=0;fontChoice=0;alignmentChoice=0;backgroundChoice=0;brightness=100;systemBrightness=true
+    saveSettings();applyWindowSettings();Toast.makeText(this,"보기 설정을 초기화했습니다.",Toast.LENGTH_SHORT).show()
+   })
+  }
+ }
+ private fun showScreenSettings(){
+  settingsPanel("화면설정") { list ->
+   list.addView(settingRow("펼친 화면에서 양면보기",dualPageWide){dualPageWide=it;updateProgress()})
+   list.addView(settingRow("하단 정보 표시",showPageInfo){showPageInfo=it})
+   list.addView(settingRow("페이지 터치 영역 · 좌우터치",touchPaging){touchPaging=it})
+   if(format=="epub"){
+    list.addView(settingRow("자동 페이지 넘기기",autoScroll){autoScroll=it})
+   }
+   list.addView(settingRow("볼륨키로 페이지 넘기기",volumePaging){volumePaging=it})
+   list.addView(settingRow("상하 제스처로 밝기 조절",gestureBrightness){gestureBrightness=it})
+   list.addView(settingRow("화면 회전 잠금",rotationLock){rotationLock=it})
+   list.addView(settingRow("화면 항상 켜짐",keepScreenOn){keepScreenOn=it})
+   if(format=="epub")list.addView(settingRow("돋보기 사용",magnifier){magnifier=it})
+  }
+ }
+ private fun showContents(){
+  val entries=if(format=="pdf") (0 until total).map{"${it+1}쪽" to it} else toc
+  if(entries.isEmpty()){Toast.makeText(this,"목차를 불러오는 중입니다.",Toast.LENGTH_SHORT).show();return}
+  val indexed=format=="pdf" || chapterPages.size==total && chapterPages.all{it>0}
+  val labels=entries.map{(name,index)->if(indexed)"$name  ·  ${if(format=="pdf")index+1 else chapterPages.take(index).sum()+1}쪽" else "$name  ·  페이지 계산 중"}.toTypedArray()
+  AlertDialog.Builder(this).setTitle("목차").setItems(labels){_,which->showPage(entries[which].second)}.setNegativeButton("닫기",null).show()
+ }
+ private fun koreanVoices()=tts?.voices?.filter{it.locale.language=="ko"}?.sortedWith(compareBy<android.speech.tts.Voice>{it.isNetworkConnectionRequired}.thenBy{it.name}).orEmpty()
+ private fun applyTtsOptions(){
+  tts?.setSpeechRate(ttsRate);tts?.setPitch(ttsPitch)
+  val voices=koreanVoices()
+  if(voices.isNotEmpty()){
+   val selected=voices.indexOfFirst{it.name==ttsVoiceName}.takeIf{it>=0}?:ttsVoiceIndex.coerceIn(0,voices.lastIndex)
+   tts?.voice=voices[selected]
+  }
+  else tts?.language=Locale.KOREAN
+ }
+ private fun ensureTts(after:()->Unit){
+  if(ttsReady){after();return}
+  if(tts!=null){Toast.makeText(this,"음성 엔진을 준비하는 중입니다.",Toast.LENGTH_SHORT).show();return}
+  tts=TextToSpeech(this,{status->runOnUiThread{
+   if(status==TextToSpeech.SUCCESS){ttsReady=true;applyTtsOptions();tts?.setOnUtteranceProgressListener(object:UtteranceProgressListener(){
+    override fun onStart(id:String?){}
+    override fun onDone(id:String?){mainHandler.post{if(ttsPlaying&&id=="$speechSequence:$speechPart"){
+     advanceSpeech()
+    }}}
+    override fun onError(id:String?){mainHandler.post{stopSpeaking();Toast.makeText(this@StandaloneReaderActivity,"음성을 재생할 수 없습니다.",Toast.LENGTH_SHORT).show()}}
+   });after()}
+   else {tts?.shutdown();tts=null;Toast.makeText(this,"기기의 음성 엔진을 사용할 수 없습니다.",Toast.LENGTH_LONG).show()}
+  }},ttsEngine.ifBlank{null})
+ }
+ private fun advanceSpeech(){
+  if(ttsPlaying){speechPart++;if(speechPart<speechParts.size)speakPart() else if(page+1<total){showPage(page+1);startSpeaking()}else stopSpeaking()}
+ }
+ private fun clearSpeechHighlight(){speechHighlightEpoch++;web?.clearMatches()}
+ private fun highlightSpeechPart(){
+  val view=web?:return
+  if(!pageReady||!ttsPlaying)return
+  val query=speechParts.getOrNull(speechPart)?.replace(Regex("\\s+")," ")?.trim()?.take(64).orEmpty()
+  if(query.length<4){clearSpeechHighlight();return}
+  val epoch=++speechHighlightEpoch
+  view.findAllAsync(query)
+  view.postDelayed({
+   if(finished||!ttsPlaying||epoch!=speechHighlightEpoch||web!==view||view.width<=0)return@postDelayed
+   val next=(view.scrollX/view.width).coerceIn(0,(chapterPages.getOrNull(page)?:1)-1)
+   if(next!=spreadIndex){spreadIndex=next;savePage();updateProgress()}
+  },300)
+ }
+ private fun ensureSpeechEngine(after:()->Unit){
+  if(ttsMode=="android"){ensureTts(after);return}
+  if(aiVoice==null)aiVoice=AiVoiceEngine(this,{advanceSpeech()},{message->stopSpeaking();Toast.makeText(this,message,Toast.LENGTH_LONG).show()})
+  aiVoice?.prepare(when(ttsMode){"ridi"->"ridi";"willa"->"willa";else->"yes24"}){if(it)after()}
+ }
+ private fun updateListeningAction(){listeningAction?.text=if(ttsPlaying)"일시정지" else "재생"}
+ private fun stopSpeaking(){ttsPlaying=false;updateListeningAction();clearSpeechHighlight();speechSequence++;speechPreparedPage=-1;tts?.stop();aiVoice?.stop()}
+ private fun pauseSpeaking(){ttsPlaying=false;updateListeningAction();clearSpeechHighlight();speechSequence++;tts?.stop();aiVoice?.stop()}
+ private fun speakPart(){
+  if(!ttsPlaying||speechPart !in speechParts.indices)return
+  if(timerDeadline>0&&System.currentTimeMillis()>=timerDeadline){stopSpeaking();return}
+  highlightSpeechPart()
+  if(ttsMode!="android")aiVoice?.play(speechParts[speechPart],when(ttsMode){"ridi"->ridiVoiceIndex;"willa"->willaVoiceIndex;else->aiVoiceIndex},ttsRate,ttsPitch,ttsReadParentheses,ttsSkipHanja)
+  else {
+   if(speechEnglish.getOrNull(speechPart)==true)tts?.language=Locale.US else applyTtsOptions()
+   tts?.speak(speechParts[speechPart],TextToSpeech.QUEUE_FLUSH,null,"$speechSequence:$speechPart")
+  }
+ }
+ private fun startSpeaking(){
+  if(format!="epub"){Toast.makeText(this,"PDF 듣기는 이 뷰어에서 지원되지 않습니다.",Toast.LENGTH_LONG).show();return}
+  ensureSpeechEngine {
+   if(speechPreparedPage==page&&speechParts.isNotEmpty()){
+    speechSequence++;ttsPlaying=true;updateListeningAction();speakPart();return@ensureSpeechEngine
+   }
+   stopSpeaking();val request=++speechSequence;ttsPlaying=true;updateListeningAction()
+   val chapter=spine.getOrNull(page)?:return@ensureSpeechEngine
+   worker.execute{
+    val text=try{
+     val entry=zip?.getEntry(chapter)?:throw IllegalArgumentException()
+     if(entry.size>2_000_000L)throw IllegalArgumentException()
+     val html=zip!!.getInputStream(entry).bufferedReader().use{it.readText()}
+     var spoken=Html.fromHtml(html.replace(Regex("(?is)<(script|style)[^>]*>.*?</\\1>"),""),Html.FROM_HTML_MODE_LEGACY).toString()
+     if(!ttsReadParentheses)spoken=spoken.replace(Regex("\\([^)]*\\)|（[^）]*）"),"")
+     if(ttsSkipHanja)spoken=spoken.replace(Regex("[\\u4e00-\\u9fff]+"),"")
+     spoken.replace(Regex("[\\t ]+")," ").trim()
+    }catch(_:Exception){""}
+    val prepared=ArrayList<Pair<String,Boolean>>()
+    for(clause in text.split(Regex("(?<=[.!?。])\\s+|\\n+"))){
+     if(clause.isBlank())continue
+     val english=ttsAutoLanguage&&clause.count{it in 'A'..'Z'||it in 'a'..'z'}>=8&&clause.count{it in '가'..'힣'}*2<clause.length
+     for(part in clause.trim().chunked(350))prepared.add(part to english)
+    }
+    mainHandler.post{
+     if(!finished&&ttsPlaying&&request==speechSequence){
+      speechParts=prepared.filter{it.first.isNotBlank()}.map{it.first}
+      speechEnglish=prepared.filter{it.first.isNotBlank()}.map{it.second}
+      speechPart=0;speechPreparedPage=page
+      if(speechParts.isEmpty()){stopSpeaking();Toast.makeText(this,"읽을 본문이 없습니다.",Toast.LENGTH_SHORT).show()}else speakPart()
+     }
+    }
+   }
+  }
+ }
+ private fun showListening(){
+  if(format!="epub"){AlertDialog.Builder(this).setTitle("듣기").setMessage("PDF의 텍스트 추출을 지원하지 않아 듣기를 사용할 수 없습니다.").setPositiveButton("확인",null).show();return}
+  settingsPanel("듣기") { list ->
+   listeningAction=button(if(ttsPlaying)"일시정지" else "재생"){
+    if(ttsPlaying)pauseSpeaking() else startSpeaking()
+   }
+   list.addView(listeningAction)
+   list.addView(speechSeekRow("읽기속도",5,30,(ttsRate*10).toInt()){
+    ttsRate=it;prefs.edit().putFloat("tts_rate",ttsRate).apply();applyTtsOptions()
+   })
+   list.addView(button("음성 엔진"){
+    ensureTts {
+     val engines=tts?.engines.orEmpty().filter{it.name!="com.samsung.SMT"}
+     val available=buildList {
+      if(VoiceModules.installed(this@StandaloneReaderActivity,"yes24"))add("ai" to "YES24 AI 음성")
+      if(VoiceModules.installed(this@StandaloneReaderActivity,"ridi"))add("ridi" to "Selvy AI 음성")
+      if(VoiceModules.installed(this@StandaloneReaderActivity,"willa"))add("willa" to "ONNX AI 음성")
+     }
+     val labels=available.map{it.second}+engines.map{it.label}
+     val selected=if(ttsMode=="android")available.size+engines.indexOfFirst{it.name==ttsEngine}.coerceAtLeast(0)
+      else available.indexOfFirst{it.first==ttsMode}.coerceAtLeast(0)
+     AlertDialog.Builder(this).setTitle("음성 엔진").setSingleChoiceItems(labels.toTypedArray(),selected){dialog,which->
+      stopSpeaking()
+      if(which<available.size){
+       val next=available[which].first
+       if(ttsMode!=next){aiVoice?.close();aiVoice=null}
+       ttsMode=next;prefs.edit().putString("tts_mode",next).apply()
+      }else {aiVoice?.close();aiVoice=null;ttsMode="android";ttsEngine=engines[which-available.size].name;ttsVoiceName="";ttsVoiceIndex=0
+       prefs.edit().putString("tts_mode","android").putString("tts_engine",ttsEngine).remove("tts_voice_name").putInt("tts_voice",0).apply()
+       tts?.shutdown();tts=null;ttsReady=false
+      }
+      dialog.dismiss()
+      if(which>=available.size)ensureTts { Toast.makeText(this,"${labels[which]} 엔진을 선택했습니다.",Toast.LENGTH_SHORT).show() }
+     }.show()
+    }
+   })
+   list.addView(button("음성 선택"){
+    if(ttsMode=="ai"||ttsMode=="ridi"||ttsMode=="willa"){
+     val ridi=ttsMode=="ridi"
+     val willa=ttsMode=="willa"
+     AlertDialog.Builder(this).setTitle(if(ridi)"Selvy AI 음성 선택" else if(willa)"ONNX AI 음성 선택" else "YES24 AI 음성 선택")
+      .setSingleChoiceItems(if(ridi)RidiVoiceData.names else if(willa)WillaVoices.names else AiVoiceData.names,
+       if(ridi)ridiVoiceIndex else if(willa)willaVoiceIndex else aiVoiceIndex){dialog,which->
+       stopSpeaking()
+       if(ridi){ridiVoiceIndex=which;prefs.edit().putInt("ridi_voice",which).apply()}
+       else if(willa){willaVoiceIndex=which;prefs.edit().putInt("willa_voice",which).apply()}
+       else {aiVoiceIndex=which;prefs.edit().putInt("ai_voice",which).apply()}
+       dialog.dismiss()
+      }.setPositiveButton("확인",null).show()
+     return@button
+    }
+    ensureTts {
+     val voices=koreanVoices()
+     if(voices.isEmpty())Toast.makeText(this,"사용 가능한 한국어 음성이 없습니다.",Toast.LENGTH_SHORT).show()
+     else AlertDialog.Builder(this).setTitle("음성 선택").setSingleChoiceItems(voices.map{voice->
+      val group=voices.filter{it.isNetworkConnectionRequired==voice.isNetworkConnectionRequired}
+      (if(voice.isNetworkConnectionRequired)"온라인 한국어 음성 " else "기기 한국어 음성 ")+(group.indexOf(voice)+1)
+     }.toTypedArray(),voices.indexOfFirst{it.name==tts?.voice?.name}){dialog,which->
+      ttsVoiceIndex=which;ttsVoiceName=voices[which].name;prefs.edit().putInt("tts_voice",which).putString("tts_voice_name",ttsVoiceName).apply();applyTtsOptions();dialog.dismiss()
+     }.show()
+    }
+   })
+   list.addView(button("타이머"){
+    val labels=arrayOf("사용 안 함","10분","20분","30분","60분")
+    val minutes=intArrayOf(0,10,20,30,60)
+    AlertDialog.Builder(this).setTitle("타이머").setItems(labels){_,which->timerDeadline=if(minutes[which]==0)0 else System.currentTimeMillis()+minutes[which]*60_000L}.show()
+   })
+   list.addView(speechSeekRow("음정",5,20,(ttsPitch*10).toInt()){
+    ttsPitch=it;prefs.edit().putFloat("tts_pitch",ttsPitch).apply();applyTtsOptions()
+   })
+   list.addView(button("듣기설정"){
+    settingsPanel("듣기설정"){options->
+     options.addView(settingRow("한영 자동 전환",ttsAutoLanguage){ttsAutoLanguage=it;prefs.edit().putBoolean("tts_auto_language",it).apply()})
+     options.addView(settingRow("괄호안 문장읽기",ttsReadParentheses){ttsReadParentheses=it;prefs.edit().putBoolean("tts_read_parentheses",it).apply()})
+     options.addView(settingRow("한자 읽지 않음",ttsSkipHanja){ttsSkipHanja=it;prefs.edit().putBoolean("tts_skip_hanja",it).apply()})
+    }
+   })
+  }
+  if(!ttsPlaying)startSpeaking()
+ }
+ override fun onKeyDown(keyCode:Int,event:android.view.KeyEvent):Boolean {
+  if(volumePaging&&keyCode==android.view.KeyEvent.KEYCODE_VOLUME_DOWN){navigate(1);return true}
+  if(volumePaging&&keyCode==android.view.KeyEvent.KEYCODE_VOLUME_UP){navigate(-1);return true}
+  return super.onKeyDown(keyCode,event)
+ }
+ override fun onConfigurationChanged(newConfig:Configuration){
+  val wasSpread=lastSpreadMode
+  super.onConfigurationChanged(newConfig)
+  lastSpreadMode=twoPages()
+  if(wasSpread!=twoPages()){
+   if(format=="pdf"){
+    if(twoPages())page-=page%2
+    body.post{updateProgress();renderPdf()}
+   }else{
+    intent.putExtra("restoreSpread",if(wasSpread)spreadIndex*2 else spreadIndex/2)
+    recreate()
+   }
+  }else if(format=="pdf"&&total>0)body.post{renderPdf()}
+ }
+ override fun onDestroy(){
+  finished=true;generation++
+  mainHandler.removeCallbacks(scrollTick)
+  stopSpeaking();tts?.shutdown();tts=null;aiVoice?.close();aiVoice=null
+  indexEpoch++
+  indexWeb?.destroy();indexWeb=null
+  web?.destroy()
+  worker.shutdownNow()
+  try{pdf?.close()}catch(_:Exception){}
+  try{pdfFd?.close()}catch(_:Exception){}
+  try{zip?.close()}catch(_:Exception){}
+  tmp?.delete()
+  if(intent.getBooleanExtra("deleteOnClose",false)&&!isChangingConfigurations)src?.path?.let { path -> runCatching {
+   val file=File(path).canonicalFile
+   val root=File(cacheDir,"yes24-reader").canonicalFile
+   if(file.parentFile==root)file.delete()
+  } }
+  super.onDestroy()
+ }
+}

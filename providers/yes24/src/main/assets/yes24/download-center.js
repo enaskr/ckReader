@@ -1,0 +1,16 @@
+"use strict";
+(function(){
+  let refreshToken=0;
+  const make=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;};
+  async function load(mode){return rpc('downloadCenterData',{mode});}
+  async function remove(mode,id,deleteFile=false){return rpc('downloadCenterDelete',{mode,id,deleteFile});}
+  function completedAt(value){const d=new Date(Number(value));if(!Number.isFinite(d.getTime()))return '';const two=n=>String(n).padStart(2,'0');return d.getFullYear()+'.'+two(d.getMonth()+1)+'.'+two(d.getDate())+' '+two(d.getHours())+':'+two(d.getMinutes())+':'+two(d.getSeconds());}
+  function displayTitle(item){const title=item.title||'제목 없음';const legacy=/^(Crema|YES24) eBook\s*·\s*(\d+)$/.exec(title);if(!legacy)return title;const name=(item.name||'').replace(/\.[^.]+$/,'');const withoutId=name.replace(/-urn_uuid_[0-9a-f-]+$/i,'').replace(/-\d+$/,'');const split=withoutId.indexOf('-');const book=(split<0?withoutId:withoutId.slice(0,split))||'제목 없음';const author=split<0?'저자 미상':withoutId.slice(split+1)||'저자 미상';const extension=(item.name||'').split('.').pop()||'epub';return legacy[1]+' eBook - '+book+' - '+author+' - '+extension+' - '+legacy[2];}
+  function draw(mode,data){
+    const target=document.getElementById(mode==='queue'?'downloadQueueList':'savedFilesList');target.replaceChildren();
+    const items=Array.from(data?.items||[]);
+    if(!items.length){const e=make('div','empty',mode==='queue'?'다운로드 큐가 비어 있습니다.':'저장된 파일이 없습니다.');target.append(e);return;}
+    for(const item of items){const card=make('section','panel');if(mode!=='queue'){const cremaId=/^Crema eBook(?:\s*·\s*|.* - )(\d+)$/.exec(item.title||'')?.[1];const cover=String(item.cover|| (cremaId?'https://image.yes24.com/goods/'+cremaId+'/L':'' )).replace(/^\/\//,'https://').replace(/^http:/i,'https:');if(/^https:\/\//i.test(cover)){const img=make('img','download-cover');img.alt='책 표지';img.src=cover;img.onerror=()=>img.remove();card.append(img);}}card.append(make('h3','',displayTitle(item)));const meta=mode==='queue'?[item.state,item.message].filter(Boolean).join(' · '):(item.name||item.path||item.uri||'');if(meta)card.append(make('p','',meta));if(mode!=='queue'&&item.completedAt)card.append(make('p','',completedAt(item.completedAt)));const actions=make('div','detailactions');if(mode!=='queue'&&/\.(epub|pdf)$/i.test(item.name||item.path||'')&&/^(content|file):/i.test(item.uri||'')){const read=make('button','primary','바로보기');read.onclick=async()=>{read.disabled=true;try{await rpc('downloadCenterRead',{id:item.id});}catch(e){toast(e.message);}finally{read.disabled=false;}};actions.append(read);}const del=make('button','danger','삭제');del.onclick=async()=>draw(mode,await remove(mode,item.id,false));actions.append(del);if(mode!=='queue'){const f=make('button','danger','파일삭제');f.onclick=async()=>draw(mode,await remove(mode,item.id,true));actions.append(f);}card.append(actions);target.append(card);}
+  }
+  window.renderDownloadCenter=async mode=>{const token=++refreshToken;try{draw(mode,await load(mode));if(mode==='queue')setTimeout(()=>{const panel=document.getElementById(mode==='queue'?'downloadQueuePanel':'savedFilesPanel');if(token===refreshToken&&panel&&!panel.hidden)window.renderDownloadCenter(mode);},1500);}catch(e){toast(e.message);}};
+})();
